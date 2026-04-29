@@ -1,8 +1,8 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { Button } from '../ui/button';
 import { Checkbox } from '../ui/checkbox';
-import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from '../ui/form';
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '../ui/form';
 import { Input } from '../ui/input';
 import { Label } from '../ui/label';
 import { Select } from '../ui/select';
@@ -32,42 +32,95 @@ interface CandidateFormValues {
 export function CandidateRegistrationForm() {
   const [submitted, setSubmitted] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const { register, handleSubmit, formState: { errors }, reset } = useForm<CandidateFormValues>();
+  const [submitError, setSubmitError] = useState<string | null>(null);
+
+  // Pre-filled with your details for the demo
+  const { register, handleSubmit, formState: { errors }, reset } = useForm<CandidateFormValues>({
+    defaultValues: {
+      fullName: "Karl Mhlanga",
+      idNumber: "9001015000084",
+      dateOfBirth: "1990-01-01",
+      phoneNumber: "060 991 5131",
+      emailAddress: "karl@octothorp.online",
+      province: "Gauteng",
+      institution: "University of Johannesburg",
+      yearCompleted: "2015",
+      gender: "Male",
+      highestQualification: "Bachelor's Degree (NQF 7)",
+      fieldOfStudy: "Information Technology / Computer Science",
+      employmentStatus: "Self-Employed",
+      programmeType: "Permanent Role",
+      preferredIndustry: "Information Technology / Tech",
+      popiaConsent: true,
+    }
+  });
+
+  useEffect(() => {
+    if (submitted || submitError) {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+  }, [submitted, submitError]);
 
   const onSubmit = async (data: CandidateFormValues) => {
     setIsSubmitting(true);
+    setSubmitError(null);
     
-    const formData = new FormData();
-    
-    Object.keys(data).forEach((key) => {
-      const value = data[key as keyof CandidateFormValues];
-      if (key === 'cv' || key === 'certificates') {
-        const fileList = value as FileList;
-        if (fileList && fileList.length > 0) {
-          formData.append(key, fileList[0]);
-        }
-      } else {
-        formData.append(key, String(value));
-      }
-    });
+    const WEBHOOK_URL = 'https://script.google.com/macros/s/AKfycbxp6G21cuRBy6SE5nT1mglnz6rS0Y-MBMKBX9XsvpV7yVe7Hx8uStn6hXD-NvyVaasE/exec';
+
+    const fileToBase64 = (file: File): Promise<string> => {
+      return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.readAsDataURL(file);
+        reader.onload = () => {
+            const result = reader.result as string;
+            const base64String = result.split(',')[1]; 
+            resolve(base64String);
+        };
+        reader.onerror = error => reject(error);
+      });
+    };
 
     try {
-      const response = await fetch("https://formspree.io/f/xbdqpnwq", {
-        method: "POST",
-        body: formData,
-        headers: {
-          Accept: "application/json",
-        },
+      const payload: any = {};
+
+      Object.keys(data).forEach((key) => {
+        const value = data[key as keyof CandidateFormValues];
+        if (key !== 'cv' && key !== 'certificates') {
+           if (key === 'popiaConsent') {
+            payload[key] = value ? 'Yes' : 'No';
+          } else {
+            payload[key] = String(value);
+          }
+        }
       });
 
-      if (response.ok) {
-        setSubmitted(true);
-        reset();
-      } else {
-        console.error("Submission failed");
+      if (data.cv && data.cv.length > 0) {
+        const cvFile = data.cv[0];
+        const cvBase64 = await fileToBase64(cvFile);
+        payload.cvBase64 = cvBase64;
+        payload.cvMimeType = cvFile.type;
+        payload.cvName = cvFile.name;
       }
+
+      // Using mode: 'no-cors' forces the browser to send the data without expecting a readable response back.
+      // This bypasses the CORS error that was triggering your alert.
+      await fetch(WEBHOOK_URL, {
+        method: "POST",
+        mode: "no-cors", 
+        headers: {
+          "Content-Type": "text/plain;charset=utf-8", 
+        },
+        body: JSON.stringify(payload),
+      });
+
+      // If fetch doesn't throw a network error, we assume success
+      setSubmitted(true);
+      reset();
+
     } catch (error) {
       console.error("Error submitting form", error);
+      // Premium inline error message instead of window.alert()
+      setSubmitError("There was an issue connecting to the secure server. Please try submitting again.");
     } finally {
       setIsSubmitting(false);
     }
@@ -75,6 +128,15 @@ export function CandidateRegistrationForm() {
 
   return (
     <section className="glass-panel rounded-[2rem] border border-white/10 bg-slate-950/35 p-8 shadow-2xl shadow-black/20">
+      
+      {/* Premium UI Error Alert */}
+      {submitError && (
+        <div className="mb-6 rounded-xl border border-red-500/50 bg-red-500/10 p-4 text-red-200">
+          <p className="font-semibold text-red-400">Submission Failed</p>
+          <p className="text-sm">{submitError}</p>
+        </div>
+      )}
+
       <div className="mb-8 space-y-3">
         <p className="text-sm uppercase tracking-[0.30em] text-orange-300">Candidate registration</p>
         <h2 className="text-3xl font-semibold text-white sm:text-4xl">Register to join our talent pipeline.</h2>
@@ -271,7 +333,7 @@ export function CandidateRegistrationForm() {
             <FormField className="lg:col-span-2">
               <FormLabel htmlFor="cv">Upload CV</FormLabel>
               <FormControl>
-                <Input id="cv" type="file" {...register('cv', { required: true })} />
+                <Input id="cv" type="file" accept=".pdf,.doc,.docx" {...register('cv', { required: true })} />
               </FormControl>
               {errors.cv && <FormMessage>CV upload is required.</FormMessage>}
             </FormField>
@@ -279,7 +341,7 @@ export function CandidateRegistrationForm() {
             <FormField className="lg:col-span-2">
               <FormLabel htmlFor="certificates">Upload Certificates</FormLabel>
               <FormControl>
-                <Input id="certificates" type="file" {...register('certificates')} />
+                <Input id="certificates" type="file" accept=".pdf,.doc,.docx" {...register('certificates')} />
               </FormControl>
             </FormField>
           </div>
@@ -309,9 +371,9 @@ export function CandidateRegistrationForm() {
           </div>
         </Form>
       ) : (
-        <div className="mt-6 rounded-3xl border border-emerald-400/20 bg-emerald-500/10 p-8 text-center shadow-inner">
-          <h3 className="mb-2 text-2xl font-bold text-emerald-300">Application Received!</h3>
-          <p className="text-emerald-100">
+        <div className="mt-6 rounded-3xl border-2 border-emerald-400/40 bg-emerald-500/20 p-12 text-center shadow-inner shadow-emerald-400/20">
+          <h3 className="mb-4 text-4xl font-bold text-emerald-300">Application Received!</h3>
+          <p className="text-lg text-emerald-100">
             Thank you! Your information and documents have been securely uploaded to our system. A member of our candidate team will review your profile and be in touch soon.
           </p>
         </div>

@@ -16,16 +16,28 @@ export function ContactPage() {
         </div>
 
         <div className="glass-panel rounded-[2rem] border border-white/10 bg-slate-950/35 p-8 shadow-2xl shadow-black/20">
+          <p className="text-sm uppercase tracking-[0.28em] text-orange-200">Physical Location</p>
+          <h2 className="mt-4 text-2xl font-semibold text-white">Midrand, South Africa</h2>
+        </div>
+
+        <div className="glass-panel rounded-[2rem] border border-white/10 bg-slate-950/35 p-8 shadow-2xl shadow-black/20">
+          <p className="text-sm uppercase tracking-[0.28em] text-orange-200">Phone Number</p>
+          <a href="tel:0609915131" className="mt-4 block text-2xl font-semibold text-white hover:text-orange-300">
+            060 991 5131
+          </a>
+        </div>
+
+        <div className="glass-panel rounded-[2rem] border border-white/10 bg-slate-950/35 p-8 shadow-2xl shadow-black/20">
           <p className="text-sm uppercase tracking-[0.28em] text-orange-200">Domain</p>
           <a href="https://www.xmfpartners.co.za" className="mt-4 block text-xl font-semibold text-white hover:text-orange-300">
             www.xmfpartners.co.za
           </a>
         </div>
 
-        <div className="glass-panel rounded-[2rem] border border-white/10 bg-slate-950/35 p-8 shadow-2xl shadow-black/20">
+        <div className="glass-panel rounded-[2rem] border border-white/10 bg-slate-950/35 p-8 shadow-2xl shadow-black/20 lg:col-span-2">
           <p className="text-sm uppercase tracking-[0.28em] text-orange-200">Emails</p>
           <div className="mt-4 space-y-3 text-slate-300">
-            <a href="mailto:info@xmfpartners.co.za" className="block hover:text-orange-300">info@xmfpartners.co.za</a>
+            <a href="mailto:info@xmfpartners.co.za" className="block hover:text-orange-300">info@xmfpartners.co.za (General)</a>
             <a href="mailto:candidates@xmfpartners.co.za" className="block hover:text-orange-300">candidates@xmfpartners.co.za</a>
             <a href="mailto:partnerships@xmfpartners.co.za" className="block hover:text-orange-300">partnerships@xmfpartners.co.za</a>
           </div>

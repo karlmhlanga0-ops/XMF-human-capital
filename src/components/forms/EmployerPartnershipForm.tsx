@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { Button } from '../ui/button';
 import { Checkbox } from '../ui/checkbox';
@@ -40,6 +40,12 @@ export function EmployerPartnershipForm() {
   const [submitted, setSubmitted] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { register, handleSubmit, formState: { errors }, reset } = useForm<EmployerFormValues>();
+
+  useEffect(() => {
+    if (submitted) {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+  }, [submitted]);
 
   const onSubmit = async (data: EmployerFormValues) => {
     setIsSubmitting(true);
@@ -243,9 +249,9 @@ export function EmployerPartnershipForm() {
           </div>
         </Form>
       ) : (
-        <div className="mt-6 rounded-3xl border border-emerald-400/20 bg-emerald-500/10 p-8 text-center shadow-inner">
-          <h3 className="mb-2 text-2xl font-bold text-emerald-300">Enquiry Received!</h3>
-          <p className="text-emerald-100">
+        <div className="mt-6 rounded-3xl border-2 border-emerald-400/40 bg-emerald-500/20 p-12 text-center shadow-inner shadow-emerald-400/20">
+          <h3 className="mb-4 text-4xl font-bold text-emerald-300">Enquiry Received!</h3>
+          <p className="text-lg text-emerald-100">
             Thank you! We have securely received your partnership enquiry. Our team will review your requirements and contact you shortly to outline the next steps.
           </p>
         </div>
