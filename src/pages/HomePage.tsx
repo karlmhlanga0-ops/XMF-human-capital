@@ -28,7 +28,7 @@ export function HomePage() {
         {/* Background Image */}
         <div 
           className="absolute inset-0 z-0 bg-cover bg-center bg-no-repeat opacity-80"
-          style={{ backgroundImage: "url('/src/assets/backgrounds/background-image.png')" }}
+          style={{ backgroundImage: "url('../src/assets/backgrounds/background-image.png')" }}
         ></div>
 
         {/* Premium Overlay Gradient */}
