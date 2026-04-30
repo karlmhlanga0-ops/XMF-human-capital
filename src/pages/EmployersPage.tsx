@@ -1,6 +1,9 @@
 import { EmployerPartnershipForm } from '../components/forms/EmployerPartnershipForm';
 import { Target, TrendingUp, Users, Award } from 'lucide-react';
 
+// 1. IMPORT THE IMAGE HERE (Adjust the '../' depending on exactly where this file lives in your folder structure)
+import heroBackground from '../assets/backgrounds/alternate-background-image.png';
+
 const benefits = [
   { 
     title: 'Structured learning outcomes', 
@@ -33,7 +36,7 @@ export function EmployersPage() {
         {/* Background Image */}
         <div 
           className="absolute inset-0 z-0 bg-cover bg-center bg-no-repeat opacity-60"
-          style={{ backgroundImage: "url('/src/assets/backgrounds/partners-background.png')" }}
+          style={{ backgroundImage: "url('/src/assets/backgrounds/alternate-background-image.png')" }}
         ></div>
         
         {/* Elegant Gradient Overlay */}

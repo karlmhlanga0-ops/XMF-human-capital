@@ -1,6 +1,7 @@
 import { CandidateRegistrationForm } from '../components/forms/CandidateRegistrationForm';
 import { BookOpen, GraduationCap, Briefcase, TrendingUp } from 'lucide-react';
-
+// 1. IMPORT THE IMAGE HERE (Adjust the '../' depending on exactly where this file lives in your folder structure)
+import heroBackground from '../assets/backgrounds/partners-background.png';
 const opportunities = [
   { 
     title: 'Learnerships', 
@@ -33,7 +34,7 @@ export function CandidatesPage() {
         {/* Background Image */}
         <div 
           className="absolute inset-0 z-0 bg-cover bg-center bg-no-repeat opacity-70"
-          style={{ backgroundImage: "url('/src/assets/backgrounds/alternate-background-image.png')" }}
+          style={{ backgroundImage: "url('/src/assets/backgrounds/partners-background.png')" }}
         ></div>
         
         {/* Elegant Gradient Overlay */}
