@@ -1,46 +1,87 @@
+import { MapPin, Phone, Mail, Globe } from 'lucide-react';
+
 export function ContactPage() {
   return (
-    <div className="space-y-12 py-10 text-slate-100">
-      <section className="glass-panel rounded-[2rem] border border-white/10 bg-slate-950/35 p-10 shadow-2xl shadow-black/20">
-        <p className="text-sm uppercase tracking-[0.28em] text-orange-200">Contact</p>
-        <h1 className="mt-4 text-4xl font-semibold text-white sm:text-5xl">Contact XMF Human Capital Partners</h1>
-        <p className="mt-6 max-w-3xl text-lg leading-8 text-slate-300">
-          Connect with our team for candidate registration, employer partnerships, or to learn more about our talent pipeline services.
-        </p>
+    <div className="w-full bg-slate-50 min-h-screen">
+      
+      {/* Premium Hero Section with Orange Flare */}
+      <section className="relative w-full h-[50vh] min-h-[400px] flex items-center overflow-hidden bg-[#1E254C]">
+        {/* Abstract Orange Light Bleed */}
+        <div className="absolute top-0 right-1/4 w-[500px] h-[500px] bg-[#D76A36] rounded-full blur-[140px] opacity-50 pointer-events-none"></div>
+        <div className="absolute inset-0 z-10 bg-gradient-to-b from-transparent to-[#1E254C]/80"></div>
+
+        <div className="relative z-20 w-full max-w-[1240px] mx-auto px-6 lg:px-8 pt-10">
+          <div className="max-w-2xl animate-in fade-in slide-in-from-bottom-8 duration-700 text-center mx-auto">
+            <p className="text-[#D76A36] font-bold uppercase tracking-[0.2em] text-sm mb-4">
+              Get in Touch
+            </p>
+            <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-white leading-tight mb-6">
+              Contact XMF Human Capital Partners.
+            </h1>
+            <p className="text-lg text-slate-200 leading-relaxed max-w-xl mx-auto">
+              Connect with our team for candidate registration, employer partnerships, or to learn more about our talent pipeline services.
+            </p>
+          </div>
+        </div>
       </section>
 
-      <section className="grid gap-6 lg:grid-cols-3">
-        <div className="glass-panel rounded-[2rem] border border-white/10 bg-slate-950/35 p-8 shadow-2xl shadow-black/20">
-          <p className="text-sm uppercase tracking-[0.28em] text-orange-200">Company</p>
-          <h2 className="mt-4 text-2xl font-semibold text-white">XMF Human Capital Partners (Pty) Ltd</h2>
-        </div>
-
-        <div className="glass-panel rounded-[2rem] border border-white/10 bg-slate-950/35 p-8 shadow-2xl shadow-black/20">
-          <p className="text-sm uppercase tracking-[0.28em] text-orange-200">Physical Location</p>
-          <h2 className="mt-4 text-2xl font-semibold text-white">Midrand, South Africa</h2>
-        </div>
-
-        <div className="glass-panel rounded-[2rem] border border-white/10 bg-slate-950/35 p-8 shadow-2xl shadow-black/20">
-          <p className="text-sm uppercase tracking-[0.28em] text-orange-200">Phone Number</p>
-          <a href="tel:0609915131" className="mt-4 block text-2xl font-semibold text-white hover:text-orange-300">
-            060 991 5131
-          </a>
-        </div>
-
-        <div className="glass-panel rounded-[2rem] border border-white/10 bg-slate-950/35 p-8 shadow-2xl shadow-black/20">
-          <p className="text-sm uppercase tracking-[0.28em] text-orange-200">Domain</p>
-          <a href="https://www.xmfpartners.co.za" className="mt-4 block text-xl font-semibold text-white hover:text-orange-300">
-            www.xmfpartners.co.za
-          </a>
-        </div>
-
-        <div className="glass-panel rounded-[2rem] border border-white/10 bg-slate-950/35 p-8 shadow-2xl shadow-black/20 lg:col-span-2">
-          <p className="text-sm uppercase tracking-[0.28em] text-orange-200">Emails</p>
-          <div className="mt-4 space-y-3 text-slate-300">
-            <a href="mailto:info@xmfpartners.co.za" className="block hover:text-orange-300">info@xmfpartners.co.za (General)</a>
-            <a href="mailto:candidates@xmfpartners.co.za" className="block hover:text-orange-300">candidates@xmfpartners.co.za</a>
-            <a href="mailto:partnerships@xmfpartners.co.za" className="block hover:text-orange-300">partnerships@xmfpartners.co.za</a>
+      {/* Contact Grid */}
+      <section className="relative z-30 -mt-16 mx-auto max-w-[1240px] px-6 lg:px-8 mb-24">
+        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
+          
+          {/* Location Card */}
+          <div className="bg-white rounded-xl p-8 shadow-lg shadow-slate-200/50 border border-slate-100 hover:-translate-y-1 transition-all duration-300">
+            <div className="bg-slate-50 w-14 h-14 rounded-lg flex items-center justify-center mb-6 text-[#D76A36]">
+              <MapPin className="w-7 h-7" />
+            </div>
+            <p className="text-xs font-bold uppercase tracking-[0.2em] text-[#3E4CA0] mb-2">Location</p>
+            <h3 className="text-lg font-bold text-slate-900">Midrand</h3>
+            <p className="text-slate-600 text-sm mt-1">South Africa</p>
           </div>
+
+          {/* Phone Card */}
+          <div className="bg-white rounded-xl p-8 shadow-lg shadow-slate-200/50 border border-slate-100 hover:-translate-y-1 transition-all duration-300">
+            <div className="bg-slate-50 w-14 h-14 rounded-lg flex items-center justify-center mb-6 text-[#D76A36]">
+              <Phone className="w-7 h-7" />
+            </div>
+            <p className="text-xs font-bold uppercase tracking-[0.2em] text-[#3E4CA0] mb-2">Phone</p>
+            <a href="tel:0609915131" className="text-lg font-bold text-slate-900 hover:text-[#D76A36] transition-colors">
+              060 991 5131
+            </a>
+            <p className="text-slate-600 text-sm mt-1">Mon-Fri, 8am-5pm</p>
+          </div>
+
+          {/* Domain Card */}
+          <div className="bg-white rounded-xl p-8 shadow-lg shadow-slate-200/50 border border-slate-100 hover:-translate-y-1 transition-all duration-300">
+            <div className="bg-slate-50 w-14 h-14 rounded-lg flex items-center justify-center mb-6 text-[#D76A36]">
+              <Globe className="w-7 h-7" />
+            </div>
+            <p className="text-xs font-bold uppercase tracking-[0.2em] text-[#3E4CA0] mb-2">Website</p>
+            <a href="https://www.xmfhcp.co.za" target="_blank" rel="noopener noreferrer" className="text-lg font-bold text-slate-900 hover:text-[#D76A36] transition-colors">
+              xmfhcp.co.za
+            </a>
+            <p className="text-slate-600 text-sm mt-1">Official Domain</p>
+          </div>
+
+          {/* Emails Card (Spans across nicely if needed, or fits in standard grid) */}
+          <div className="bg-white rounded-xl p-8 shadow-lg shadow-slate-200/50 border border-slate-100 hover:-translate-y-1 transition-all duration-300 md:col-span-2 lg:col-span-1">
+            <div className="bg-slate-50 w-14 h-14 rounded-lg flex items-center justify-center mb-6 text-[#D76A36]">
+              <Mail className="w-7 h-7" />
+            </div>
+            <p className="text-xs font-bold uppercase tracking-[0.2em] text-[#3E4CA0] mb-3">Emails</p>
+            <div className="space-y-3">
+              <a href="mailto:info@xmfhcp.co.za" className="block text-sm font-semibold text-slate-900 hover:text-[#D76A36] transition-colors">
+                info@xmfhcp.co.za <span className="text-slate-500 font-normal ml-1">(General)</span>
+              </a>
+              <a href="mailto:candidates@xmfhcp.co.za" className="block text-sm font-semibold text-slate-900 hover:text-[#D76A36] transition-colors">
+                candidates@xmfhcp.co.za
+              </a>
+              <a href="mailto:partnerships@xmfhcp.co.za" className="block text-sm font-semibold text-slate-900 hover:text-[#D76A36] transition-colors">
+                partnerships@xmfhcp.co.za
+              </a>
+            </div>
+          </div>
+
         </div>
       </section>
     </div>

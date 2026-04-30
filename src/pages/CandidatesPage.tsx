@@ -1,36 +1,82 @@
 import { CandidateRegistrationForm } from '../components/forms/CandidateRegistrationForm';
-import { Card } from '../components/ui/card';
+import { BookOpen, GraduationCap, Briefcase, TrendingUp } from 'lucide-react';
 
 const opportunities = [
-  { title: 'Learnerships', description: 'Structured training programmes designed to grow skills and open new career pathways.' },
-  { title: 'Graduate Programmes', description: 'Cohort-based roles for graduates ready to join talent pipelines and fast-track development.' },
-  { title: 'Internships', description: 'Hands-on placements across corporate, tech and operational teams to build workplace experience.' },
-  { title: 'Entry-Level Roles', description: 'Early career positions for candidates ready to contribute and grow in stable organisations.' },
+  { 
+    title: 'Learnerships', 
+    description: 'Structured training programmes designed to grow skills and open new career pathways.',
+    icon: <BookOpen className="w-8 h-8 text-[#D76A36]" />
+  },
+  { 
+    title: 'Graduate Programmes', 
+    description: 'Cohort-based roles for graduates ready to join talent pipelines and fast-track development.',
+    icon: <GraduationCap className="w-8 h-8 text-[#D76A36]" />
+  },
+  { 
+    title: 'Internships', 
+    description: 'Hands-on placements across corporate, tech and operational teams to build workplace experience.',
+    icon: <Briefcase className="w-8 h-8 text-[#D76A36]" />
+  },
+  { 
+    title: 'Entry-Level Roles', 
+    description: 'Early career positions for candidates ready to contribute and grow in stable organisations.',
+    icon: <TrendingUp className="w-8 h-8 text-[#D76A36]" />
+  },
 ];
 
 export function CandidatesPage() {
   return (
-    <div className="space-y-12 py-10 text-slate-100">
-      <section className="glass-panel rounded-[2rem] border border-white/10 bg-slate-950/35 p-10 shadow-2xl shadow-black/20">
-        <p className="text-sm uppercase tracking-[0.28em] text-orange-200">Candidates</p>
-        <h1 className="mt-4 text-4xl font-semibold text-white sm:text-5xl">Opportunities for learners, graduates and emerging professionals.</h1>
-        <p className="mt-6 max-w-3xl text-lg leading-8 text-slate-300">
-          Register your profile to access learnerships, graduate programmes, internships and entry-level roles with leading South African employers.
-        </p>
+    <div className="w-full bg-slate-50 min-h-screen">
+      
+      {/* Premium Hero Section */}
+      <section className="relative w-full h-[50vh] min-h-[400px] flex items-center overflow-hidden bg-slate-900">
+        {/* Background Image */}
+        <div 
+          className="absolute inset-0 z-0 bg-cover bg-center bg-no-repeat opacity-70"
+          style={{ backgroundImage: "url('/src/assets/backgrounds/alternate-background-image.png')" }}
+        ></div>
+        
+        {/* Elegant Gradient Overlay */}
+        <div className="absolute inset-0 z-10 bg-gradient-to-r from-[#1E254C]/95 via-[#1E254C]/70 to-transparent"></div>
+
+        <div className="relative z-20 w-full max-w-[1240px] mx-auto px-6 lg:px-8">
+          <div className="max-w-2xl animate-in fade-in slide-in-from-bottom-8 duration-700">
+            <p className="text-[#D76A36] font-bold uppercase tracking-[0.2em] text-sm mb-4">
+              For Candidates
+            </p>
+            <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-white leading-tight mb-6">
+              Launch your career with leading employers.
+            </h1>
+            <p className="text-lg text-slate-200 leading-relaxed max-w-xl">
+              Register your profile to access learnerships, graduate programmes, internships, and entry-level roles across South Africa.
+            </p>
+          </div>
+        </div>
       </section>
 
-      <section className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
-        {opportunities.map((item) => (
-          <Card key={item.title} className="p-6">
-            <p className="text-sm uppercase tracking-[0.30em] text-orange-200">{item.title}</p>
-            <p className="mt-4 text-slate-300 leading-7">{item.description}</p>
-          </Card>
-        ))}
+      {/* Opportunities Grid */}
+      <section className="relative z-30 -mt-16 mx-auto max-w-[1240px] px-6 lg:px-8 mb-20">
+        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
+          {opportunities.map((item, idx) => (
+            <div 
+              key={item.title} 
+              className="bg-white rounded-xl p-8 shadow-lg shadow-slate-200/50 border border-slate-100 hover:-translate-y-2 hover:shadow-xl transition-all duration-300"
+              style={{ animationDelay: `${idx * 0.1}s` }}
+            >
+              <div className="bg-slate-50 w-16 h-16 rounded-lg flex items-center justify-center mb-6 transition-colors duration-300 group-hover:bg-[#D76A36]/10">
+                {item.icon}
+              </div>
+              <h3 className="text-xl font-bold text-slate-900 mb-3">{item.title}</h3>
+              <p className="text-slate-600 leading-relaxed text-sm">{item.description}</p>
+            </div>
+          ))}
+        </div>
       </section>
 
-      <div className="rounded-[2rem] border border-white/10 bg-slate-950/35 p-8 shadow-2xl shadow-black/20">
+      {/* Registration Form Section */}
+      <section className="pb-24 max-w-[1240px] mx-auto px-6 lg:px-8">
         <CandidateRegistrationForm />
-      </div>
+      </section>
     </div>
   );
 }

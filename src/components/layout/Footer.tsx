@@ -1,25 +1,74 @@
 import { Link } from 'react-router-dom';
+import logoWhite from '../../assets/XMF_LONG_WHITE.png';
 
 export function Footer() {
   return (
-    <footer className="border-t border-white/10 bg-slate-950/75 px-4 py-10 text-slate-300 backdrop-blur-xl sm:px-6 lg:px-8">
-      <div className="mx-auto flex max-w-[1240px] flex-col gap-6 md:flex-row md:items-center md:justify-between">
-        <div>
-          <p className="text-sm font-semibold uppercase tracking-[0.25em] text-orange-300">XMF Human Capital Partners</p>
-          <p className="mt-3 max-w-xl text-sm leading-6 text-slate-400">
-            A premium South African talent partner connecting learnerships, graduates, and future leaders with employers.
-          </p>
+    <footer className="border-t border-white/10 bg-slate-950/95 px-6 py-16 text-slate-300 backdrop-blur-xl lg:px-8">
+      <div className="mx-auto max-w-[1240px]">
+        {/* Main Footer Content */}
+        <div className="grid grid-cols-1 gap-12 md:grid-cols-4 mb-12">
+          {/* Brand Section */}
+          <div className="md:col-span-2">
+            <Link to="/" className="inline-block mb-4">
+              <img 
+                src={logoWhite} 
+                alt="XMF Human Capital Partners" 
+                className="h-12 w-auto"
+              />
+            </Link>
+            <p className="text-sm leading-6 text-slate-400 max-w-sm">
+              A premium South African talent partner connecting learnerships, graduates, and future leaders with employers who value investment in people.
+            </p>
+          </div>
+
+          {/* Quick Links */}
+          <div>
+            <h3 className="text-sm font-semibold uppercase tracking-[0.15em] text-white mb-4 block">Company</h3>
+            <nav className="space-y-3 text-sm">
+              <Link to="/about" className="text-slate-400 hover:text-white transition-colors">
+                About Us
+              </Link>
+              <Link to="/services" className="text-slate-400 hover:text-white transition-colors">
+                Services
+              </Link>
+              <Link to="/contact" className="text-slate-400 hover:text-white transition-colors">
+                Contact
+              </Link>
+            </nav>
+          </div>
+
+          {/* For Everyone */}
+          <div>
+            <h3 className="text-sm font-semibold uppercase tracking-[0.15em] text-white mb-4 block">Access</h3>
+            <nav className="space-y-3 text-sm">
+              <Link to="/candidates" className="text-slate-400 hover:text-white transition-colors">
+                For Candidates
+              </Link>
+              <Link to="/employers" className="text-slate-400 hover:text-white transition-colors">
+                For Employers
+              </Link>
+              <a 
+                href="mailto:info@xmfpartners.co.za" 
+                className="text-slate-400 hover:text-white transition-colors"
+              >
+                Email Us
+              </a>
+            </nav>
+          </div>
         </div>
-        <div className="flex flex-wrap gap-4 text-sm text-slate-400">
-          <Link to="/" className="transition hover:text-white">
-            Home
-          </Link>
-          <Link to="/contact" className="transition hover:text-white">
-            Contact
-          </Link>
-          <a href="mailto:info@xmfpartners.co.za" className="transition hover:text-white">
-            info@xmfpartners.co.za
-          </a>
+
+        {/* Divider */}
+        <div className="border-t border-white/10 pt-8">
+          {/* Bottom Footer */}
+          <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+            <p className="text-xs text-slate-500">
+              © {new Date().getFullYear()} XMF Human Capital Partners. All rights reserved.
+            </p>
+            <div className="flex gap-6 text-xs text-slate-500">
+              <a href="#" className="hover:text-white transition-colors">Privacy Policy</a>
+              <a href="#" className="hover:text-white transition-colors">Terms of Service</a>
+            </div>
+          </div>
         </div>
       </div>
     </footer>

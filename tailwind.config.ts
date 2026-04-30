@@ -9,7 +9,7 @@ export default {
       },
       colors: {
         brand: {
-          blue: '#4B5195',
+          blue: '#3E4CA0',
           orange: '#D76A36',
         },
       },

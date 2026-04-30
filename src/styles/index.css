@@ -19,7 +19,7 @@ body {
   margin: 0;
   min-height: 100vh;
   background: radial-gradient(circle at top, rgba(215, 106, 54, 0.16), transparent 25%),
-    linear-gradient(180deg, #4B5195 0%, #2E2B63 100%);
+    linear-gradient(180deg, #3E4CA0 0%, #2E2B63 100%);
   color: #0f172a;
   text-rendering: optimizeLegibility;
 }
@@ -47,6 +47,42 @@ body::after {
 
 .shadow-glow {
   box-shadow: 0 30px 80px rgba(215, 106, 54, 0.18);
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.6s ease-in-out;
+}
+
+.animate-slide-up {
+  animation: slideUp 0.6s ease-out;
+}
+
+.animate-slide-up-delay-1 {
+  animation: slideUp 0.6s ease-out 0.1s both;
+}
+
+.animate-slide-up-delay-2 {
+  animation: slideUp 0.6s ease-out 0.2s both;
 }
 
 ::selection {

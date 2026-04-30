@@ -1,33 +1,38 @@
 import { NavLink } from 'react-router-dom';
+import logoWhite from '../../assets/XMF_LONG_WHITE.png';
 
 const navigation = [
-  { label: 'Home', to: '/' },
   { label: 'About', to: '/about' },
   { label: 'Services', to: '/services' },
-  { label: 'Employers', to: '/employers' },
-  { label: 'Candidates', to: '/candidates' },
+  { label: 'For Employers', to: '/employers' },
+  { label: 'For Candidates', to: '/candidates' },
   { label: 'Contact', to: '/contact' },
 ];
 
 export function Navbar() {
   return (
-    <header className="sticky top-0 z-30 border-b border-white/10 bg-slate-950/70 backdrop-blur-xl">
-      <div className="mx-auto flex max-w-[1240px] items-center justify-between px-4 py-5 sm:px-6 lg:px-8">
-        <div>
-          <NavLink to="/" className="text-lg font-semibold tracking-[0.15em] text-white/90 uppercase">
-            XMF Human Capital Partners
-          </NavLink>
-          <p className="mt-0.5 text-xs uppercase tracking-[0.25em] text-orange-200/90">Talent pipeline partner</p>
-        </div>
+    <header className="sticky top-0 z-40 border-b border-white/10 bg-slate-950/90 backdrop-blur-xl">
+      <div className="mx-auto flex max-w-[1240px] items-center justify-between px-6 py-4 lg:px-8">
+        {/* Logo */}
+        <NavLink to="/" className="flex-shrink-0 transition-opacity hover:opacity-80">
+          <img 
+            src={logoWhite} 
+            alt="XMF Human Capital Partners" 
+            className="h-12 w-auto"
+          />
+        </NavLink>
 
-        <nav className="hidden items-center gap-6 md:flex">
+        {/* Desktop Navigation */}
+        <nav className="hidden lg:flex items-center gap-8">
           {navigation.map((item) => (
             <NavLink
               key={item.to}
               to={item.to}
               className={({ isActive }) =>
-                `text-sm font-medium transition ${
-                  isActive ? 'text-white' : 'text-slate-300 hover:text-white'
+                `text-sm font-medium transition-colors duration-200 ${
+                  isActive 
+                    ? 'text-brand-orange' 
+                    : 'text-slate-300 hover:text-white'
                 }`
               }
             >
@@ -35,6 +40,16 @@ export function Navbar() {
             </NavLink>
           ))}
         </nav>
+
+        {/* CTA Button */}
+        <div className="hidden lg:flex">
+          <NavLink
+            to="/candidates"
+            className="px-6 py-2 rounded-lg bg-brand-orange text-white font-semibold text-sm hover:bg-[#c25a29] transition-colors"
+          >
+            Get Started
+          </NavLink>
+        </div>
       </div>
     </header>
   );
