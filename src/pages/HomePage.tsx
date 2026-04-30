@@ -2,6 +2,9 @@ import { Link } from 'react-router-dom';
 import { Button } from '../components/ui/button';
 import { BookOpen, Users, Award, GraduationCap, Target } from 'lucide-react';
 
+// 1. IMPORT THE IMAGE HERE (Adjust the '../' depending on exactly where this file lives in your folder structure)
+import heroBackground from '../assets/backgrounds/background-image.png';
+
 const propsItems = [
   {
     title: 'Skills Development',
@@ -25,10 +28,11 @@ export function HomePage() {
     <div className="space-y-0 w-full bg-slate-50">
       {/* Hero Section - Full Width, Left Aligned Content */}
       <section className="relative w-full min-h-[85vh] flex items-center overflow-hidden bg-slate-900">
-        {/* Background Image */}
+        
+        {/* 2. USE THE IMPORTED VARIABLE HERE WITH A TEMPLATE LITERAL */}
         <div 
           className="absolute inset-0 z-0 bg-cover bg-center bg-no-repeat opacity-80"
-          style={{ backgroundImage: "url('../src/assets/backgrounds/background-image.png')" }}
+          style={{ backgroundImage: `url(${heroBackground})` }}
         ></div>
 
         {/* Premium Overlay Gradient */}
