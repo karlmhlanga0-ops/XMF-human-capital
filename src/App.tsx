@@ -5,7 +5,9 @@ import { CandidatesPage } from './pages/CandidatesPage';
 import { ContactPage } from './pages/ContactPage';
 import { EmployersPage } from './pages/EmployersPage';
 import { HomePage } from './pages/HomePage';
+import { PrivacyPolicy } from './pages/PrivacyPolicy';
 import { ServicesPage } from './pages/ServicesPage';
+import { TermsOfService } from './pages/TermsOfService';
 
 function App() {
   return (
@@ -18,6 +20,8 @@ function App() {
           <Route path="employers" element={<EmployersPage />} />
           <Route path="candidates" element={<CandidatesPage />} />
           <Route path="contact" element={<ContactPage />} />
+          <Route path="privacy-policy" element={<PrivacyPolicy />} />
+          <Route path="terms-of-service" element={<TermsOfService />} />
           <Route path="*" element={<Navigate to="/" replace />} />
         </Route>
       </Routes>

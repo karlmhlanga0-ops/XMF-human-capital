@@ -2,9 +2,6 @@ import { Link } from 'react-router-dom';
 import { Button } from '../components/ui/button';
 import { BookOpen, Users, Award, GraduationCap, Target } from 'lucide-react';
 
-// 1. IMPORT THE IMAGE HERE (Adjust the '../' depending on exactly where this file lives in your folder structure)
-import heroBackground from '../assets/backgrounds/background-image.png';
-
 const propsItems = [
   {
     title: 'Skills Development',
@@ -29,10 +26,10 @@ export function HomePage() {
       {/* Hero Section - Full Width, Left Aligned Content */}
       <section className="relative w-full min-h-[85vh] flex items-center overflow-hidden bg-slate-900">
         
-        {/* 2. USE THE IMPORTED VARIABLE HERE WITH A TEMPLATE LITERAL */}
+        {/* CLOUDINARY SMART HACK APPLIED HERE */}
         <div 
           className="absolute inset-0 z-0 bg-cover bg-center bg-no-repeat opacity-80"
-          style={{ backgroundImage: `url(${heroBackground})` }}
+          style={{ backgroundImage: "url('https://res.cloudinary.com/didgosar5/image/upload/q_auto,f_auto/v1777628960/background-image_xgpygz.png')" }}
         ></div>
 
         {/* Premium Overlay Gradient */}
@@ -44,7 +41,7 @@ export function HomePage() {
             <p className="text-[#D76A36] font-semibold uppercase tracking-[0.3em] text-sm mb-6">
               Welcome to XMF
             </p>
-            <h1 className="text-5xl md:text-6xl lg:text-7xl font-bold text-white leading-[1.1] mb-6 drop-shadow-md">
+            <h1 className="text-5xl md:text-6xl lg:text-7xl font-bold text-white leading-[1.1] mb-6 drop-shadow-md text-balance">
               Your Talent Pipeline Partner
             </h1>
             <p className="text-lg md:text-xl text-slate-200 mb-10 max-w-xl leading-relaxed drop-shadow-sm">
@@ -55,12 +52,12 @@ export function HomePage() {
             <div className="flex flex-col sm:flex-row gap-5">
               <Link to="/candidates">
                 <Button className="w-full sm:w-auto bg-[#D76A36] hover:bg-[#c25a29] text-white font-semibold text-base px-8 py-6 rounded-md transition-all duration-300 hover:shadow-lg hover:shadow-[#D76A36]/20">
-                  I'm a Candidate
+                  Register as a Candidate
                 </Button>
               </Link>
               <Link to="/employers">
                 <Button className="w-full sm:w-auto bg-white/10 hover:bg-white/20 text-white border border-white/20 backdrop-blur-sm font-semibold text-base px-8 py-6 rounded-md transition-all duration-300">
-                  I'm Looking to Partner
+                  Partner with Us
                 </Button>
               </Link>
             </div>
@@ -74,7 +71,7 @@ export function HomePage() {
           <div className="flex flex-col gap-10 md:flex-row md:items-center md:justify-between">
             <div className="max-w-md">
               <p className="text-sm font-semibold uppercase tracking-[0.2em] text-[#D76A36]">Trusted Partners</p>
-              <h2 className="mt-4 text-3xl font-semibold text-white leading-tight">
+              <h2 className="mt-4 text-3xl font-semibold text-white leading-tight text-balance">
                 Leading organisations trust XMF to build their talent pipelines.
               </h2>
             </div>
@@ -97,7 +94,7 @@ export function HomePage() {
         <div className="mx-auto max-w-[1240px] px-6 lg:px-8">
           <div className="mb-16 max-w-2xl">
             <p className="text-sm font-semibold uppercase tracking-[0.2em] text-[#D76A36] mb-4">Why Choose XMF</p>
-            <h2 className="text-3xl font-bold text-slate-900 sm:text-4xl lg:text-5xl leading-tight">
+            <h2 className="text-3xl font-bold text-slate-900 sm:text-4xl lg:text-5xl leading-tight text-balance">
               Our commitment to excellence guides everything we do.
             </h2>
           </div>
@@ -126,14 +123,14 @@ export function HomePage() {
         <div className="mx-auto max-w-[1240px] px-6 lg:px-8">
           <div className="mb-16 max-w-2xl">
             <p className="text-sm font-semibold uppercase tracking-[0.2em] text-[#D76A36] mb-4">Our Solutions</p>
-            <h2 className="text-3xl font-bold text-slate-900 sm:text-4xl lg:text-5xl leading-tight">
+            <h2 className="text-3xl font-bold text-slate-900 sm:text-4xl lg:text-5xl leading-tight text-balance">
               Specialized talent solutions for every organisational need.
             </h2>
           </div>
           <div className="grid gap-8 lg:grid-cols-2">
             {/* Learnership Card */}
             <div className="group flex flex-col overflow-hidden rounded-2xl bg-white shadow-sm border border-slate-100 hover:shadow-2xl hover:-translate-y-1 transition-all duration-500 cursor-pointer">
-              <div className="relative h-64 overflow-hidden bg-gradient-to-br from-[#3E4CA0] to-[#273273] flex items-center justify-center">
+              <div className="relative h-64 overflow-hidden bg-gradient-to-br from-[#3E4CA0] to-[#1E254C] flex items-center justify-center">
                 <GraduationCap className="w-20 h-20 text-white/90 group-hover:scale-110 transition-transform duration-500" strokeWidth={1.5} />
                 <div className="absolute inset-0 bg-black/10 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
               </div>
@@ -178,7 +175,7 @@ export function HomePage() {
         <div className="relative z-10 mx-auto max-w-[1240px] px-6 lg:px-8 flex flex-col gap-10 lg:flex-row lg:items-center lg:justify-between">
           <div className="max-w-3xl">
             <p className="text-sm font-semibold uppercase tracking-[0.2em] text-white/70 mb-4">Ready to get started?</p>
-            <h2 className="text-4xl font-bold leading-tight text-white sm:text-5xl">
+            <h2 className="text-4xl font-bold leading-tight text-white sm:text-5xl text-balance">
               Join XMF and unlock premium talent pipelines.
             </h2>
             <p className="mt-6 max-w-2xl text-lg text-white/80 leading-relaxed">

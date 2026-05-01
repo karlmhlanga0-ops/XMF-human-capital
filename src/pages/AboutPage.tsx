@@ -43,7 +43,7 @@ export function AboutPage() {
             <p className="text-[#D76A36] font-bold uppercase tracking-[0.2em] text-sm mb-4 bg-white/10 w-fit px-4 py-1.5 rounded-full border border-white/10 backdrop-blur-md">
               About Us
             </p>
-            <h1 className="text-4xl md:text-5xl lg:text-7xl font-bold text-white leading-tight mb-8">
+            <h1 className="text-4xl md:text-5xl lg:text-7xl font-bold text-white leading-tight mb-8 text-balance">
               Specialist talent pipeline partner for South Africa’s future.
             </h1>
             <p className="text-lg md:text-xl text-slate-200 leading-relaxed">
@@ -65,7 +65,7 @@ export function AboutPage() {
                 <ShieldCheck className="w-8 h-8" />
               </div>
               <p className="text-sm font-bold uppercase tracking-[0.2em] text-[#D76A36] mb-3">Our Role</p>
-              <h2 className="text-3xl md:text-4xl font-bold text-slate-900 mb-6 leading-tight">
+              <h2 className="text-3xl md:text-4xl font-bold text-slate-900 mb-6 leading-tight text-balance">
                 From candidate discovery to employer readiness.
               </h2>
               <p className="text-slate-600 leading-relaxed text-lg">
@@ -74,18 +74,8 @@ export function AboutPage() {
             </div>
 
             {/* Right Column */}
-            <div className="group bg-[#3E4CA0] rounded-[2rem] p-10 md:p-12 shadow-sm hover:shadow-2xl transition-all duration-500 relative overflow-hidden">
-              <div className="absolute top-0 right-0 w-48 h-48 bg-[#D76A36]/20 rounded-full blur-3xl pointer-events-none"></div>
-              <div className="bg-white/10 backdrop-blur-md border border-white/20 w-16 h-16 rounded-xl flex items-center justify-center mb-8 text-white group-hover:scale-110 transition-transform duration-500">
-                <Zap className="w-8 h-8" />
-              </div>
-              <p className="text-sm font-bold uppercase tracking-[0.2em] text-[#D76A36] mb-3">How We Work</p>
-              <h2 className="text-3xl md:text-4xl font-bold text-white mb-6 leading-tight">
-                Data-driven sourcing with an African human touch.
-              </h2>
-              <p className="text-slate-200 leading-relaxed text-lg">
-                We combine deep local market knowledge with smooth, candidate-centered onboarding. This ensures our talent pipelines deliver dependable outcomes for employers, while creating meaningful opportunities for learners and emerging professionals.
-              </p>
+            <div className="rounded-3xl overflow-hidden shadow-xl border border-slate-200">
+              <img src="https://res.cloudinary.com/didgosar5/image/upload/v1777628876/office-collaboration_eubjqk.png" alt="Office collaboration" className="h-full w-full object-cover" />
             </div>
 
           </div>
@@ -97,7 +87,7 @@ export function AboutPage() {
         <div className="mx-auto max-w-[1240px] px-6 lg:px-8">
           <div className="text-center max-w-2xl mx-auto mb-16">
             <p className="text-sm font-bold uppercase tracking-[0.2em] text-[#D76A36] mb-4">Core Values</p>
-            <h2 className="text-3xl md:text-4xl font-bold text-slate-900 leading-tight">
+            <h2 className="text-3xl md:text-4xl font-bold text-slate-900 leading-tight text-balance">
               Built on integrity, driven by outcomes.
             </h2>
           </div>

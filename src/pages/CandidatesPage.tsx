@@ -1,7 +1,6 @@
 import { CandidateRegistrationForm } from '../components/forms/CandidateRegistrationForm';
 import { BookOpen, GraduationCap, Briefcase, TrendingUp } from 'lucide-react';
-// 1. IMPORT THE IMAGE HERE (Adjust the '../' depending on exactly where this file lives in your folder structure)
-import heroBackground from '../assets/backgrounds/partners-background.png';
+
 const opportunities = [
   { 
     title: 'Learnerships', 
@@ -31,10 +30,11 @@ export function CandidatesPage() {
       
       {/* Premium Hero Section */}
       <section className="relative w-full h-[50vh] min-h-[400px] flex items-center overflow-hidden bg-slate-900">
-        {/* Background Image */}
+        
+        {/* CLOUDINARY SMART HACK APPLIED HERE */}
         <div 
           className="absolute inset-0 z-0 bg-cover bg-center bg-no-repeat opacity-70"
-          style={{ backgroundImage: "url('/src/assets/backgrounds/partners-background.png')" }}
+          style={{ backgroundImage: "url('https://res.cloudinary.com/didgosar5/image/upload/q_auto,f_auto/v1777628867/partners-background_vvw341.png')" }}
         ></div>
         
         {/* Elegant Gradient Overlay */}
@@ -42,10 +42,10 @@ export function CandidatesPage() {
 
         <div className="relative z-20 w-full max-w-[1240px] mx-auto px-6 lg:px-8">
           <div className="max-w-2xl animate-in fade-in slide-in-from-bottom-8 duration-700">
-            <p className="text-[#D76A36] font-bold uppercase tracking-[0.2em] text-sm mb-4">
+            <p className="text-[#D76A36] font-bold uppercase tracking-[0.2em] text-sm mb-4 bg-white/10 w-fit px-4 py-1.5 rounded-full border border-white/20 backdrop-blur-md">
               For Candidates
             </p>
-            <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-white leading-tight mb-6">
+            <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-white leading-tight mb-6 text-balance">
               Launch your career with leading employers.
             </h1>
             <p className="text-lg text-slate-200 leading-relaxed max-w-xl">

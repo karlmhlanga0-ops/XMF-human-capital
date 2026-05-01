@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import logoWhite from '../../assets/XMF_LONG_WHITE.png';
+import logoWhite from '../../assets/XMF_LONG_ORANGE.png';
 
 export function Footer() {
   return (
@@ -16,15 +16,16 @@ export function Footer() {
                 className="h-12 w-auto"
               />
             </Link>
+            <p className="mt-4 text-[#D76A36] font-semibold text-lg">Building Workforce Pipelines for the future.</p>
             <p className="text-sm leading-6 text-slate-400 max-w-sm">
-              A premium South African talent partner connecting learnerships, graduates, and future leaders with employers who value investment in people.
+              A premium South African talent partner connecting learners, graduates, and future leaders with employers who value investment in people.
             </p>
           </div>
 
           {/* Quick Links */}
           <div>
             <h3 className="text-sm font-semibold uppercase tracking-[0.15em] text-white mb-4 block">Company</h3>
-            <nav className="space-y-3 text-sm">
+            <nav className="flex flex-col gap-4 text-sm">
               <Link to="/about" className="text-slate-400 hover:text-white transition-colors">
                 About Us
               </Link>
@@ -40,7 +41,7 @@ export function Footer() {
           {/* For Everyone */}
           <div>
             <h3 className="text-sm font-semibold uppercase tracking-[0.15em] text-white mb-4 block">Access</h3>
-            <nav className="space-y-3 text-sm">
+            <nav className="flex flex-col gap-4 text-sm">
               <Link to="/candidates" className="text-slate-400 hover:text-white transition-colors">
                 For Candidates
               </Link>
@@ -60,13 +61,16 @@ export function Footer() {
         {/* Divider */}
         <div className="border-t border-white/10 pt-8">
           {/* Bottom Footer */}
-          <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-            <p className="text-xs text-slate-500">
-              © {new Date().getFullYear()} XMF Human Capital Partners. All rights reserved.
-            </p>
+          <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+            <div className="flex flex-col gap-2">
+              <p className="text-xs text-slate-500">
+                © {new Date().getFullYear()} XMF Human Capital Partners. All rights reserved.
+              </p>
+              <span className="text-slate-500 text-sm">Developed by Octothorp Digital Solutions</span>
+            </div>
             <div className="flex gap-6 text-xs text-slate-500">
-              <a href="#" className="hover:text-white transition-colors">Privacy Policy</a>
-              <a href="#" className="hover:text-white transition-colors">Terms of Service</a>
+              <Link to="/privacy-policy" className="hover:text-white transition-colors">Privacy Policy</Link>
+              <Link to="/terms-of-service" className="hover:text-white transition-colors">Terms of Service</Link>
             </div>
           </div>
         </div>

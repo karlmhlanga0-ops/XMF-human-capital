@@ -15,7 +15,7 @@ export function ContactPage() {
             <p className="text-[#D76A36] font-bold uppercase tracking-[0.2em] text-sm mb-4">
               Get in Touch
             </p>
-            <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-white leading-tight mb-6">
+            <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-white leading-tight mb-6 text-balance">
               Contact XMF Human Capital Partners.
             </h1>
             <p className="text-lg text-slate-200 leading-relaxed max-w-xl mx-auto">

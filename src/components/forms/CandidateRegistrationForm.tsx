@@ -50,16 +50,21 @@ export function CandidateRegistrationForm() {
     setIsSubmitting(true);
     setSubmitError(null);
     
+    // Ensure this matches your newly deployed Apps Script URL
     const WEBHOOK_URL = 'https://script.google.com/macros/s/AKfycbxp6G21cuRBy6SE5nT1mglnz6rS0Y-MBMKBX9XsvpV7yVe7Hx8uStn6hXD-NvyVaasE/exec';
 
-    const fileToBase64 = (file: File): Promise<string> => {
+    const fileToBase64 = (file: File): Promise<{base64: string, mimeType: string, name: string}> => {
       return new Promise((resolve, reject) => {
         const reader = new FileReader();
         reader.readAsDataURL(file);
         reader.onload = () => {
             const result = reader.result as string;
             const base64String = result.split(',')[1]; 
-            resolve(base64String);
+            resolve({
+              base64: base64String,
+              mimeType: file.type,
+              name: file.name
+            });
         };
         reader.onerror = error => reject(error);
       });
@@ -67,9 +72,11 @@ export function CandidateRegistrationForm() {
 
     try {
       const payload: any = {
-        formType: 'Candidate' // Added to route the data in Google Sheets
+        formType: 'Candidate', 
+        files: [] // Initialize empty array for multiple files
       };
 
+      // 1. Process Text Data
       Object.keys(data).forEach((key) => {
         const value = data[key as keyof CandidateFormValues];
         if (key !== 'cv' && key !== 'certificates') {
@@ -81,14 +88,26 @@ export function CandidateRegistrationForm() {
         }
       });
 
+      // 2. Process Files (CV + Multiple Certificates)
+      const filePromises = [];
+
+      // Add CV (Required)
       if (data.cv && data.cv.length > 0) {
-        const cvFile = data.cv[0];
-        const cvBase64 = await fileToBase64(cvFile);
-        payload.cvBase64 = cvBase64;
-        payload.cvMimeType = cvFile.type;
-        payload.cvName = cvFile.name;
+        filePromises.push(fileToBase64(data.cv[0]));
       }
 
+      // Add Certificates (Optional, Multiple)
+      if (data.certificates && data.certificates.length > 0) {
+        for (let i = 0; i < data.certificates.length; i++) {
+          filePromises.push(fileToBase64(data.certificates[i]));
+        }
+      }
+
+      // Wait for all files to be encoded
+      const processedFiles = await Promise.all(filePromises);
+      payload.files = processedFiles;
+
+      // 3. Send to Google Apps Script
       await fetch(WEBHOOK_URL, {
         method: "POST",
         mode: "no-cors", 
@@ -107,8 +126,7 @@ export function CandidateRegistrationForm() {
     }
   };
 
-  // The base input class for perfect visibility
-  const inputBaseClass = "bg-slate-100 border-slate-300 text-slate-900 placeholder:text-slate-500 focus:border-[#3E4CA0] focus:ring-[#3E4CA0]/20 h-12";
+  const inputBaseClass = "bg-slate-50 border-slate-200 text-slate-900 placeholder:text-slate-500 focus:bg-white focus:border-[#D76A36] focus:ring-[#D76A36]/20 h-12 font-medium";
 
   return (
     <div className="bg-white rounded-[2rem] border border-slate-200 p-8 md:p-12 shadow-xl shadow-slate-200/50 relative overflow-hidden">
@@ -325,15 +343,16 @@ export function CandidateRegistrationForm() {
             <FormField className="lg:col-span-2">
               <FormLabel htmlFor="certificates" className="text-slate-700 font-semibold">Upload Certificates</FormLabel>
               <FormControl>
-                <Input id="certificates" type="file" accept=".pdf,.doc,.docx" className={`pt-2.5 file:mr-4 file:py-1 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-[#3E4CA0]/10 file:text-[#3E4CA0] hover:file:bg-[#3E4CA0]/20 ${inputBaseClass}`} {...register('certificates')} />
+                <Input id="certificates" type="file" multiple accept=".pdf,.doc,.docx,.zip" className={`pt-2.5 file:mr-4 file:py-1 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-[#3E4CA0]/10 file:text-[#3E4CA0] hover:file:bg-[#3E4CA0]/20 ${inputBaseClass}`} {...register('certificates')} />
               </FormControl>
+              <p className="text-xs text-slate-500 mt-1">Upload multiple files or a single .zip folder.</p>
             </FormField>
           </div>
 
           <FormItem className="mt-8 border-t border-slate-100 pt-8">
             <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
               <Label className="flex items-start gap-3 cursor-pointer">
-                <Checkbox className="mt-1 border-slate-300 text-[#3E4CA0] focus:ring-[#3E4CA0]" {...register('popiaConsent', { required: true })} />
+                <Checkbox className="h-5 w-5 shrink-0 border-slate-300 text-[#D76A36] focus:ring-[#D76A36] mt-1" {...register('popiaConsent', { required: true })} />
                 <span className="text-sm text-slate-600 leading-relaxed max-w-2xl">
                   I consent to XMF Human Capital Partners processing my information in line with POPIA.
                 </span>

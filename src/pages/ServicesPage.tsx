@@ -40,15 +40,43 @@ export function ServicesPage() {
 
         <div className="relative z-20 w-full max-w-[1240px] mx-auto px-6 lg:px-8">
           <div className="max-w-2xl animate-in fade-in slide-in-from-bottom-8 duration-700">
-            <p className="text-[#D76A36] font-bold uppercase tracking-[0.2em] text-sm mb-4 bg-white/10 w-fit px-4 py-1.5 rounded-full border border-white/10 backdrop-blur-md">
+            <p className="text-[#D76A36] font-bold uppercase tracking-[0.2em] text-sm mb-4 bg-white/10 w-fit px-4 py-1.5 rounded-full border border-white/20 backdrop-blur-md">
               Our Services
             </p>
-            <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-white leading-tight mb-6">
+            <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-white leading-tight mb-6 text-balance">
               Strategic talent services for every stage.
             </h1>
             <p className="text-lg text-slate-200 leading-relaxed max-w-xl">
               Designed for employers seeking dependable learner, graduate and early-career recruitment that supports business growth and South African transformation priorities.
             </p>
+          </div>
+        </div>
+      </section>
+
+      {/* Service Overview Split Section */}
+      <section className="py-24 bg-slate-50">
+        <div className="mx-auto max-w-[1240px] px-6 lg:px-8 grid gap-12 lg:grid-cols-2 items-center">
+          <div>
+            <p className="text-sm font-semibold uppercase tracking-[0.2em] text-[#D76A36] mb-4">Premium service design</p>
+            <h2 className="text-3xl md:text-4xl font-bold text-slate-900 mb-6 leading-tight text-balance">
+              A premium service experience for employers and candidates.
+            </h2>
+            <p className="text-lg leading-relaxed text-slate-600 mb-8">
+              We combine strategic consulting, candidate pipeline design, and transformation-aligned sourcing to deliver measurable employer impact.
+            </p>
+            <div className="grid gap-4 sm:grid-cols-2">
+              <div className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
+                <h3 className="text-lg font-semibold text-slate-900 mb-3">Scalable engagement</h3>
+                <p className="text-slate-600 text-sm">Flexible support for campaigns of all sizes, from internships to graduate programmes.</p>
+              </div>
+              <div className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
+                <h3 className="text-lg font-semibold text-slate-900 mb-3">Value-led delivery</h3>
+                <p className="text-slate-600 text-sm">Clear commercial outcomes with a strong focus on retention and skills development.</p>
+              </div>
+            </div>
+          </div>
+          <div className="rounded-3xl overflow-hidden shadow-xl border border-slate-200">
+            <img src="https://res.cloudinary.com/didgosar5/image/upload/v1777628804/services-operation_niii6i.png" alt="Services Collaboration" className="h-full w-full object-cover" />
           </div>
         </div>
       </section>

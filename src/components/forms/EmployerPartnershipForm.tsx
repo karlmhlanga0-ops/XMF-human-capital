@@ -55,19 +55,16 @@ export function EmployerPartnershipForm() {
     setIsSubmitting(true);
     setSubmitError(null);
 
-    // Using your existing webhook URL
     const WEBHOOK_URL = 'https://script.google.com/macros/s/AKfycbxp6G21cuRBy6SE5nT1mglnz6rS0Y-MBMKBX9XsvpV7yVe7Hx8uStn6hXD-NvyVaasE/exec';
 
     try {
-      // Build the payload for the webhook
       const payload: any = {
-        formType: 'Employer' // Crucial: Tells the Apps Script which tab to use
+        formType: 'Employer' 
       };
 
       Object.keys(data).forEach((key) => {
         const value = data[key as keyof EmployerFormValues];
         if (Array.isArray(value)) {
-          // Flatten array of checkboxes into a comma-separated string
           payload[key] = value.join(', ');
         } else if (typeof value === 'boolean') {
           payload[key] = value ? 'Yes' : 'No';
@@ -94,12 +91,12 @@ export function EmployerPartnershipForm() {
     }
   };
 
-  const inputBaseClass = "bg-slate-100 border-slate-300 text-slate-900 placeholder:text-slate-500 focus:border-[#3E4CA0] focus:ring-[#3E4CA0]/20 h-12";
+  // Base class forces text-slate-900. 
+  const inputBaseClass = "bg-slate-50 border-slate-200 text-slate-900 placeholder:text-slate-500 focus:bg-white focus:border-[#D76A36] focus:ring-[#D76A36]/20 h-12 font-medium w-full";
 
   return (
     <div className="bg-white rounded-[2rem] border border-slate-200 p-8 md:p-12 shadow-xl shadow-slate-200/50 relative overflow-hidden">
       
-      {/* Decorative background element */}
       <div className="absolute top-0 right-0 w-64 h-64 bg-[#3E4CA0]/5 rounded-full blur-3xl -mr-20 -mt-20 pointer-events-none"></div>
 
       {submitError && (
@@ -120,6 +117,8 @@ export function EmployerPartnershipForm() {
       {!submitted ? (
         <Form onSubmit={handleSubmit(onSubmit)}>
           <div className="grid gap-8 lg:grid-cols-2 relative z-10">
+            
+            {/* ... standard inputs ... */}
             <FormField>
               <FormLabel htmlFor="organisationName" className="text-slate-700 font-semibold">Organisation Name</FormLabel>
               <FormControl>
@@ -176,12 +175,13 @@ export function EmployerPartnershipForm() {
               {errors.provinceLocation && <FormMessage className="text-red-500">This field is required.</FormMessage>}
             </FormField>
 
+            {/* Fixed Checkbox Sizing */}
             <FormField className="lg:col-span-2">
               <FormLabel className="text-slate-700 font-semibold block mb-4">Type of Support Required</FormLabel>
               <div className="grid gap-3 sm:grid-cols-2">
                 {supportOptions.map((option) => (
-                  <Label key={option} className="flex items-center gap-3 rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-700 transition hover:border-[#3E4CA0]/40 cursor-pointer">
-                    <Checkbox value={option} className="border-slate-300 text-[#3E4CA0] focus:ring-[#3E4CA0]" {...register('supportRequired')} />
+                  <Label key={option} className="flex items-center gap-3 rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-700 transition hover:border-[#1E254C]/40 cursor-pointer">
+                    <Checkbox value={option} className="h-5 w-5 shrink-0 border-slate-300 text-[#D76A36] focus:ring-[#D76A36] bg-white" {...register('supportRequired')} />
                     <span className="font-medium">{option}</span>
                   </Label>
                 ))}
@@ -205,22 +205,24 @@ export function EmployerPartnershipForm() {
               {errors.programmeRoleType && <FormMessage className="text-red-500">This field is required.</FormMessage>}
             </FormField>
 
+            {/* FIXED: Date Input styling */}
             <FormField>
               <FormLabel htmlFor="preferredStartDate" className="text-slate-700 font-semibold">Preferred Start Date</FormLabel>
               <FormControl>
-                <Input id="preferredStartDate" type="date" className={inputBaseClass} {...register('preferredStartDate', { required: true })} />
+                <Input id="preferredStartDate" type="date" className={`${inputBaseClass} text-slate-900 block`} style={{ color: '#0f172a' }} {...register('preferredStartDate', { required: true })} />
               </FormControl>
               {errors.preferredStartDate && <FormMessage className="text-red-500">This field is required.</FormMessage>}
             </FormField>
 
+            {/* FIXED: Select Input styling */}
             <FormField>
               <FormLabel htmlFor="bbbeeLink" className="text-slate-700 font-semibold">Linked to Skills / B-BBEE targets?</FormLabel>
               <FormControl>
-                <Select id="bbbeeLink" defaultValue="" className={inputBaseClass} {...register('bbbeeLink', { required: true })}>
-                  <option value="" disabled>Select option</option>
-                  <option value="Yes">Yes</option>
-                  <option value="No">No</option>
-                  <option value="Unsure">Unsure</option>
+                <Select id="bbbeeLink" defaultValue="" className={`${inputBaseClass} text-slate-900 appearance-none`} style={{ color: '#0f172a' }} {...register('bbbeeLink', { required: true })}>
+                  <option value="" disabled className="text-slate-500">Select option</option>
+                  <option value="Yes" className="text-slate-900">Yes</option>
+                  <option value="No" className="text-slate-900">No</option>
+                  <option value="Unsure" className="text-slate-900">Unsure</option>
                 </Select>
               </FormControl>
               {errors.bbbeeLink && <FormMessage className="text-red-500">This field is required.</FormMessage>}
@@ -229,29 +231,31 @@ export function EmployerPartnershipForm() {
             <FormField className="lg:col-span-2">
               <FormLabel htmlFor="additionalInformation" className="text-slate-700 font-semibold">Additional Information</FormLabel>
               <FormControl>
-                <Textarea id="additionalInformation" placeholder="Please share any context, timelines or candidate profile detail" className="bg-slate-100 border-slate-300 text-slate-900 placeholder:text-slate-500 focus:border-[#3E4CA0] focus:ring-[#3E4CA0]/20 min-h-[120px] resize-y p-4" {...register('additionalInformation')} />
+                <Textarea id="additionalInformation" placeholder="Please share any context, timelines or candidate profile detail" className={`${inputBaseClass} min-h-[120px] resize-y p-4 text-slate-900`} {...register('additionalInformation')} />
               </FormControl>
             </FormField>
 
+            {/* FIXED: Select Input styling */}
             <FormField className="lg:col-span-2">
               <FormLabel htmlFor="preferredNextStep" className="text-slate-700 font-semibold">Preferred Next Step</FormLabel>
               <FormControl>
-                <Select id="preferredNextStep" defaultValue="" className={inputBaseClass} {...register('preferredNextStep', { required: true })}>
-                  <option value="" disabled>Select a next step</option>
-                  <option value="Introductory Meeting">Introductory Meeting</option>
-                  <option value="Proposal Submission">Proposal Submission</option>
-                  <option value="Candidate Shortlist">Candidate Shortlist</option>
-                  <option value="Information Session">Information Session</option>
+                <Select id="preferredNextStep" defaultValue="" className={`${inputBaseClass} text-slate-900 appearance-none`} style={{ color: '#0f172a' }} {...register('preferredNextStep', { required: true })}>
+                  <option value="" disabled className="text-slate-500">Select a next step</option>
+                  <option value="Introductory Meeting" className="text-slate-900">Introductory Meeting</option>
+                  <option value="Proposal Submission" className="text-slate-900">Proposal Submission</option>
+                  <option value="Candidate Shortlist" className="text-slate-900">Candidate Shortlist</option>
+                  <option value="Information Session" className="text-slate-900">Information Session</option>
                 </Select>
               </FormControl>
               {errors.preferredNextStep && <FormMessage className="text-red-500">This field is required.</FormMessage>}
             </FormField>
           </div>
 
+          {/* FIXED: Restored Consent Checkbox Layout */}
           <FormItem className="mt-8 border-t border-slate-100 pt-8">
             <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
               <Label className="flex items-start gap-3 cursor-pointer">
-                <Checkbox className="mt-1 border-slate-300 text-[#3E4CA0] focus:ring-[#3E4CA0]" {...register('consentToContact', { required: true })} />
+                <Checkbox className="h-5 w-5 shrink-0 border-slate-300 text-[#D76A36] focus:ring-[#D76A36] mt-1 bg-white" {...register('consentToContact', { required: true })} />
                 <span className="text-sm text-slate-600 leading-relaxed max-w-2xl">
                   I consent to XMF Human Capital Partners contacting me and processing this information in line with POPIA.
                 </span>
@@ -267,7 +271,7 @@ export function EmployerPartnershipForm() {
                 Our employer partnership team will review your enquiry and follow up with a detailed introduction and proposal.
               </p>
             </div>
-            <Button type="submit" disabled={isSubmitting} className="bg-[#3E4CA0] hover:bg-[#273273] text-white px-8 py-6 h-auto text-base font-semibold shadow-lg transition-all whitespace-nowrap">
+            <Button type="submit" disabled={isSubmitting} className="bg-[#D76A36] hover:bg-[#c25a29] text-white px-8 py-6 h-auto text-base font-semibold shadow-lg transition-all whitespace-nowrap">
               {isSubmitting ? "Sending..." : "Send partnership enquiry"}
             </Button>
           </div>

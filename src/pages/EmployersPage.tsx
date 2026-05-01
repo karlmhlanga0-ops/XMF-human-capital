@@ -1,8 +1,6 @@
 import { EmployerPartnershipForm } from '../components/forms/EmployerPartnershipForm';
+import { EasyQuoteWidget } from '../components/EasyQuoteWidget';
 import { Target, TrendingUp, Users, Award } from 'lucide-react';
-
-// 1. IMPORT THE IMAGE HERE (Adjust the '../' depending on exactly where this file lives in your folder structure)
-import heroBackground from '../assets/backgrounds/alternate-background-image.png';
 
 const benefits = [
   { 
@@ -33,10 +31,11 @@ export function EmployersPage() {
       
       {/* Premium Hero Section */}
       <section className="relative w-full h-[50vh] min-h-[400px] flex items-center overflow-hidden bg-slate-900">
-        {/* Background Image */}
+        
+        {/* CLOUDINARY SMART HACK APPLIED HERE */}
         <div 
           className="absolute inset-0 z-0 bg-cover bg-center bg-no-repeat opacity-60"
-          style={{ backgroundImage: "url('/src/assets/backgrounds/alternate-background-image.png')" }}
+          style={{ backgroundImage: "url('https://res.cloudinary.com/didgosar5/image/upload/q_auto,f_auto/v1777628914/alternate-background-image_lxnurb.png')" }}
         ></div>
         
         {/* Elegant Gradient Overlay */}
@@ -44,10 +43,10 @@ export function EmployersPage() {
 
         <div className="relative z-20 w-full max-w-[1240px] mx-auto px-6 lg:px-8">
           <div className="max-w-2xl animate-in fade-in slide-in-from-bottom-8 duration-700">
-            <p className="text-[#3E4CA0] font-bold uppercase tracking-[0.2em] text-sm mb-4 bg-white/10 w-fit px-4 py-1.5 rounded-full border border-white/20 backdrop-blur-md">
+            <p className="text-[#D76A36] font-bold uppercase tracking-[0.2em] text-sm mb-4 bg-white/10 w-fit px-4 py-1.5 rounded-full border border-white/20 backdrop-blur-md">
               For Employers
             </p>
-            <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-white leading-tight mb-6">
+            <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-white leading-tight mb-6 text-balance">
               Value-driven sourcing for skills and equity.
             </h1>
             <p className="text-lg text-slate-200 leading-relaxed max-w-xl">
@@ -76,9 +75,12 @@ export function EmployersPage() {
         </div>
       </section>
 
-      {/* Registration Form Section */}
+      {/* Registration Form & EasyQuote Section */}
       <section className="pb-24 max-w-[1240px] mx-auto px-6 lg:px-8">
-        <EmployerPartnershipForm />
+        <div className="grid gap-10 lg:grid-cols-[1.05fr_0.95fr] items-start">
+          <EasyQuoteWidget />
+          <EmployerPartnershipForm />
+        </div>
       </section>
     </div>
   );
