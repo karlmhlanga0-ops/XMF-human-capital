@@ -1,6 +1,7 @@
+import { useState } from 'react';
 import { EmployerPartnershipForm } from '../components/forms/EmployerPartnershipForm';
 import { EasyQuoteWidget } from '../components/EasyQuoteWidget';
-import { Target, TrendingUp, Users, Award } from 'lucide-react';
+import { Target, TrendingUp, Users, Award, Calculator, MessageSquare } from 'lucide-react';
 
 const benefits = [
   { 
@@ -26,19 +27,19 @@ const benefits = [
 ];
 
 export function EmployersPage() {
+  // State to manage which form is visible. Defaults to EasyQuote to push the business goal.
+  const [activeForm, setActiveForm] = useState<'quote' | 'enquiry'>('quote');
+
   return (
     <div className="w-full bg-slate-50 min-h-screen">
       
       {/* Premium Hero Section */}
       <section className="relative w-full h-[50vh] min-h-[400px] flex items-center overflow-hidden bg-slate-900">
-        
-        {/* CLOUDINARY SMART HACK APPLIED HERE */}
         <div 
           className="absolute inset-0 z-0 bg-cover bg-center bg-no-repeat opacity-60"
           style={{ backgroundImage: "url('https://res.cloudinary.com/didgosar5/image/upload/q_auto,f_auto/v1777628914/alternate-background-image_lxnurb.png')" }}
         ></div>
         
-        {/* Elegant Gradient Overlay */}
         <div className="absolute inset-0 z-10 bg-gradient-to-r from-[#1E254C]/95 via-[#1E254C]/70 to-transparent"></div>
 
         <div className="relative z-20 w-full max-w-[1240px] mx-auto px-6 lg:px-8">
@@ -57,7 +58,7 @@ export function EmployersPage() {
       </section>
 
       {/* Benefits Grid */}
-      <section className="relative z-30 -mt-16 mx-auto max-w-[1240px] px-6 lg:px-8 mb-20">
+      <section className="relative z-30 -mt-16 mx-auto max-w-[1240px] px-6 lg:px-8 mb-24">
         <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
           {benefits.map((item, idx) => (
             <div 
@@ -75,13 +76,75 @@ export function EmployersPage() {
         </div>
       </section>
 
-      {/* Registration Form & EasyQuote Section */}
-      <section className="pb-24 max-w-[1240px] mx-auto px-6 lg:px-8">
-        <div className="grid gap-10 lg:grid-cols-[1.05fr_0.95fr] items-start">
-          <EasyQuoteWidget />
-          <EmployerPartnershipForm />
+      {/* Dynamic Action Center */}
+      <section className="pb-32 max-w-[1240px] mx-auto px-6 lg:px-8">
+        <div className="grid gap-12 lg:grid-cols-[400px_1fr] items-start">
+          
+          {/* Left Column: Sticky Explainer & Controls */}
+          <div className="lg:sticky lg:top-32 space-y-8 bg-white p-8 rounded-3xl border border-slate-200 shadow-xl shadow-slate-200/40">
+            
+            <div className="space-y-4">
+              <h2 className="text-3xl font-bold text-[#1E254C] leading-tight">
+                Take the next step with XMF.
+              </h2>
+              <p className="text-slate-600 leading-relaxed">
+                Use our proprietary <strong className="text-[#D76A36]">EasyQuote™</strong> engine to generate an instant, official cost estimate for your talent pipeline needs. 
+              </p>
+              <p className="text-slate-600 leading-relaxed">
+                Alternatively, submit a general enquiry and our team will build a bespoke partnership proposal.
+              </p>
+            </div>
+
+            {/* AODA Compliant Form Toggle */}
+            <div className="flex flex-col gap-4 pt-4 border-t border-slate-100">
+              <button
+                onClick={() => setActiveForm('quote')}
+                className={`flex items-center gap-4 px-6 py-4 rounded-xl text-left font-bold transition-all duration-200 focus:outline-none focus:ring-4 focus:ring-[#D76A36]/30 ${
+                  activeForm === 'quote' 
+                    ? 'bg-[#D76A36] text-white shadow-lg shadow-[#D76A36]/20 border border-[#D76A36]' 
+                    : 'bg-slate-50 text-slate-700 hover:bg-slate-100 border border-slate-200'
+                }`}
+                aria-pressed={activeForm === 'quote'}
+              >
+                <div className={`p-2 rounded-lg ${activeForm === 'quote' ? 'bg-white/20' : 'bg-white shadow-sm'}`}>
+                  <Calculator className="w-5 h-5" />
+                </div>
+                <div>
+                  <span className="block text-sm uppercase tracking-wider opacity-80 mb-0.5">Recommended</span>
+                  <span className="block text-lg">Generate Official Quote</span>
+                </div>
+              </button>
+
+              <button
+                onClick={() => setActiveForm('enquiry')}
+                className={`flex items-center gap-4 px-6 py-4 rounded-xl text-left font-bold transition-all duration-200 focus:outline-none focus:ring-4 focus:ring-[#1E254C]/30 ${
+                  activeForm === 'enquiry' 
+                    ? 'bg-[#1E254C] text-white shadow-lg border border-[#1E254C]' 
+                    : 'bg-slate-50 text-slate-700 hover:bg-slate-100 border border-slate-200'
+                }`}
+                aria-pressed={activeForm === 'enquiry'}
+              >
+                <div className={`p-2 rounded-lg ${activeForm === 'enquiry' ? 'bg-white/20' : 'bg-white shadow-sm'}`}>
+                  <MessageSquare className="w-5 h-5" />
+                </div>
+                <span className="block text-lg">Submit General Enquiry</span>
+              </button>
+            </div>
+            
+          </div>
+
+          {/* Right Column: Dynamic Component Rendering */}
+          <div className="w-full relative min-h-[600px] animate-in fade-in slide-in-from-right-4 duration-500" key={activeForm}>
+            {activeForm === 'quote' ? (
+              <EasyQuoteWidget />
+            ) : (
+              <EmployerPartnershipForm />
+            )}
+          </div>
+
         </div>
       </section>
+
     </div>
   );
 }

@@ -92,8 +92,7 @@ export function EmployerPartnershipForm() {
   };
 
   // Base class forces text-slate-900. 
-  const inputBaseClass = "bg-slate-50 border-slate-200 text-slate-900 placeholder:text-slate-500 focus:bg-white focus:border-[#D76A36] focus:ring-[#D76A36]/20 h-12 font-medium w-full";
-
+const inputBaseClass = "bg-slate-50 border-slate-300 !text-slate-900 placeholder:!text-slate-500 focus:bg-white focus:border-[#D76A36] focus:ring-[#D76A36]/20 h-12 font-medium w-full";
   return (
     <div className="bg-white rounded-[2rem] border border-slate-200 p-8 md:p-12 shadow-xl shadow-slate-200/50 relative overflow-hidden">
       

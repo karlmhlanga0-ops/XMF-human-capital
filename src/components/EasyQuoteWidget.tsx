@@ -305,7 +305,7 @@ export function EasyQuoteWidget() {
       </div>
 
       <div className="mt-8 pt-5 border-t border-white/10 text-center text-xs text-slate-400 relative z-10">
-        Powered by <span className="font-semibold text-[#D76A36]">EasyQuote</span> — Build your own at <a href="https://easyquote.octothorp.online" target="_blank" rel="noreferrer" className="hover:text-white transition-colors">easyquote.octothorp.online</a>
+        Powered by <span className="font-semibold text-[#D76A36]">EasyQuote™</span> — Build your own at <a href="https://easyquote.octothorp.online" target="_blank" rel="noreferrer" className="hover:text-white transition-colors">easyquote.octothorp.online</a>
       </div>
     </div>
   );

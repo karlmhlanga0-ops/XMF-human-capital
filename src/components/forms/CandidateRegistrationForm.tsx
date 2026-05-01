@@ -126,8 +126,7 @@ export function CandidateRegistrationForm() {
     }
   };
 
-  const inputBaseClass = "bg-slate-50 border-slate-200 text-slate-900 placeholder:text-slate-500 focus:bg-white focus:border-[#D76A36] focus:ring-[#D76A36]/20 h-12 font-medium";
-
+const inputBaseClass = "bg-slate-50 border-slate-300 !text-slate-900 placeholder:!text-slate-500 focus:bg-white focus:border-[#D76A36] focus:ring-[#D76A36]/20 h-12 font-medium w-full";
   return (
     <div className="bg-white rounded-[2rem] border border-slate-200 p-8 md:p-12 shadow-xl shadow-slate-200/50 relative overflow-hidden">
       <div className="absolute top-0 right-0 w-64 h-64 bg-[#D76A36]/5 rounded-full blur-3xl -mr-20 -mt-20 pointer-events-none"></div>
