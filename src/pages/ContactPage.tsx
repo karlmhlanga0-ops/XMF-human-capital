@@ -77,7 +77,7 @@ export function ContactPage() {
                 candidates@xmfpartners.co.za
               </a>
               <a href="mailto:partnerships@xmfpartners.co.za" className="block text-sm font-semibold text-slate-900 hover:text-[#D76A36] transition-colors">
-                partnerships@xmfpartners.co.za/
+                partnerships@xmfpartners.co.za
               </a>
             </div>
           </div>
