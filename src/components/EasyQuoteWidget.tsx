@@ -197,7 +197,7 @@ export function EasyQuoteWidget() {
       doc.text("XMF Human Capital Partners (Pty) Ltd", 14, 255);
       doc.text("Registration Number: 2026 / 319396 / 07", 14, 260);
       doc.text("Director: Xolani Mabaso", 14, 265);
-      doc.text("Contact: +27 60 991 5131 | info@xmfhcp.co.za", 14, 270);
+      doc.text("Contact: +27 60 991 5131 | info@xmfpartners.co.za", 14, 270);
       
       // Column 2: Banking Details
       doc.setFont("helvetica", "bold");

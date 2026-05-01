@@ -57,8 +57,8 @@ export function ContactPage() {
               <Globe className="w-7 h-7" />
             </div>
             <p className="text-xs font-bold uppercase tracking-[0.2em] text-[#3E4CA0] mb-2">Website</p>
-            <a href="https://www.xmfhcp.co.za" target="_blank" rel="noopener noreferrer" className="text-lg font-bold text-slate-900 hover:text-[#D76A36] transition-colors">
-              xmfhcp.co.za
+            <a href="https://xmfpartners.co.za/" target="_blank" rel="noopener noreferrer" className="text-lg font-bold text-slate-900 hover:text-[#D76A36] transition-colors">
+              xmfpartners.co.za
             </a>
             <p className="text-slate-600 text-sm mt-1">Official Domain</p>
           </div>
@@ -70,14 +70,14 @@ export function ContactPage() {
             </div>
             <p className="text-xs font-bold uppercase tracking-[0.2em] text-[#3E4CA0] mb-3">Emails</p>
             <div className="space-y-3">
-              <a href="mailto:info@xmfhcp.co.za" className="block text-sm font-semibold text-slate-900 hover:text-[#D76A36] transition-colors">
-                info@xmfhcp.co.za <span className="text-slate-500 font-normal ml-1">(General)</span>
+              <a href="mailto:info@xmfpartners.co.za" className="block text-sm font-semibold text-slate-900 hover:text-[#D76A36] transition-colors">
+                info@xmfpartners.co.za <span className="text-slate-500 font-normal ml-1">(General)</span>
               </a>
-              <a href="mailto:candidates@xmfhcp.co.za" className="block text-sm font-semibold text-slate-900 hover:text-[#D76A36] transition-colors">
-                candidates@xmfhcp.co.za
+              <a href="mailto:candidates@xmfpartners.co.za" className="block text-sm font-semibold text-slate-900 hover:text-[#D76A36] transition-colors">
+                candidates@xmfpartners.co.za
               </a>
-              <a href="mailto:partnerships@xmfhcp.co.za" className="block text-sm font-semibold text-slate-900 hover:text-[#D76A36] transition-colors">
-                partnerships@xmfhcp.co.za
+              <a href="mailto:partnerships@xmfpartners.co.za" className="block text-sm font-semibold text-slate-900 hover:text-[#D76A36] transition-colors">
+                partnerships@xmfpartners.co.za/
               </a>
             </div>
           </div>
