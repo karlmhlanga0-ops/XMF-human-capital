@@ -2,25 +2,53 @@ import { useEffect, useMemo, useState } from 'react';
 import { Button } from '../components/ui/button';
 import { Card } from '../components/ui/card';
 import { Textarea } from '../components/ui/textarea';
-import { ArrowRight, ChevronRight, FileText, ShieldCheck } from 'lucide-react';
+import { ArrowRight, ChevronRight, FileText, ShieldCheck, Car, MapPin } from 'lucide-react';
 import { Navigate, useNavigate } from 'react-router-dom';
 
 interface CandidateRow {
   fullName: string;
   idNumber: string;
   province: string;
-  currentlyEmployed: string;
-  previousLearnership: string;
+  gender?: string;
+  email?: string;
+  phone?: string;
+  highestQualification?: string;
+  disability?: string;
+  race?: string;
+  fieldOfStudy?: string;
+  reliableTransport?: string;
+  willingToRelocate?: string;
+  availableStartDate?: string;
+  programme?: string;
+  screeningStatus?: string; // raw CSV status
   attachmentLink: string;
-  [key: string]: string;
+  currentlyEmployed?: string;
+  previousLearnership?: string;
+  [key: string]: string | undefined;
 }
 
 type ScreeningStatus = 'Not Eligible' | 'Requires Follow-Up' | 'Eligible';
 
 function autoScreener(candidate: CandidateRow): ScreeningStatus {
+  // Prefer an explicit CSV-provided screeningStatus when present
+  const raw = (candidate as any).screeningStatus as string | undefined;
+  if (raw) {
+    const mapped = mapCsvScreening(raw);
+    if (mapped) return mapped;
+  }
+  // Fallback heuristic
   if (candidate.currentlyEmployed === 'Yes') return 'Not Eligible';
   if (candidate.previousLearnership === 'Yes') return 'Requires Follow-Up';
   return 'Eligible';
+}
+
+function mapCsvScreening(raw: string | undefined): ScreeningStatus | undefined {
+  if (!raw) return undefined;
+  const r = raw.trim().toLowerCase();
+  if (r === 'approved' || r === 'approved ' || r === 'approve') return 'Eligible';
+  if (r === 'pending') return 'Requires Follow-Up';
+  if (r === 'hold' || r === 'on hold') return 'Not Eligible';
+  return undefined;
 }
 
 const statusStyles: Record<ScreeningStatus, string> = {
@@ -58,17 +86,31 @@ export function AdminPage() {
         const headers = parsed[0].map((h) => String(h).trim());
 
         const mapHeader = (h: string) => {
-          const key = h.toLowerCase().replace(/[^a-z0-9]/g, '');
-          if (key.includes('name')) return 'fullName';
-          if (key.includes('id')) return 'idNumber';
-          if (key.includes('province')) return 'province';
-          if (key.includes('employed') || key.includes('currentlyemployed')) return 'currentlyEmployed';
-          if (key.includes('learn') || key.includes('previouslearnership')) return 'previousLearnership';
-          if (key.includes('race')) return 'race';
-          if (key.includes('disab') || key.includes('disability')) return 'disability';
-          if (key.includes('gender')) return 'gender';
-          if (key.includes('attach') || key.includes('link') || key.includes('file')) return 'attachmentLink';
-          return key;
+          const key = h.trim();
+          // Map exact published headers to internal keys
+          switch (key) {
+            case 'Timestamp': return 'timestamp';
+            case 'Name': return 'name';
+            case 'Surname': return 'surname';
+            case 'ID Number': return 'idNumber';
+            case 'Gender': return 'gender';
+            case 'Email': return 'email';
+            case 'Phone': return 'phone';
+            case 'Province': return 'province';
+            case 'Highest Qualification': return 'highestQualification';
+            case 'Disability': return 'disability';
+            case 'Race': return 'race';
+            case 'Field of Study': return 'fieldOfStudy';
+            case 'Reliable Transport': return 'reliableTransport';
+            case 'Willing to Relocate': return 'willingToRelocate';
+            case 'Available Start Date': return 'availableStartDate';
+            case 'Programme': return 'programme';
+            case 'Screening Status': return 'screeningStatus';
+            case 'Google drive link': return 'attachmentLink';
+            default:
+              // fallback: slugify header
+              return key.toLowerCase().replace(/[^a-z0-9]/g, '');
+          }
         };
 
         const items: CandidateRow[] = parsed.slice(1).map((rowArr) => {
@@ -78,6 +120,12 @@ export function AdminPage() {
             const val = rowArr[idx] ?? '';
             (item as any)[key] = String(val).trim();
           });
+          // Compose fullName from Name + Surname if present
+          const name = (item as any)['name'] || '';
+          const surname = (item as any)['surname'] || '';
+          (item as any)['fullName'] = `${name} ${surname}`.trim() || ((item as any)['fullName'] || '');
+          // Ensure attachmentLink key exists
+          (item as any)['attachmentLink'] = (item as any)['attachmentLink'] || '';
           return item;
         });
         setRows(items);
@@ -141,14 +189,19 @@ export function AdminPage() {
     });
   }
 
+  const [hasTransportFilter, setHasTransportFilter] = useState(false);
+  const [canRelocateFilter, setCanRelocateFilter] = useState(false);
+
   const filteredRows = useMemo(() => {
     return rows.filter((r) => {
       const status = autoScreener(r);
       if (filterStatus !== 'All' && status !== filterStatus) return false;
       if (filterProvince !== 'All' && (r.province || '').toLowerCase() !== filterProvince.toLowerCase()) return false;
+      if (hasTransportFilter && ((r.reliableTransport || '').toLowerCase() !== 'yes')) return false;
+      if (canRelocateFilter && ((r.willingToRelocate || '').toLowerCase() !== 'yes')) return false;
       return true;
     });
-  }, [rows, filterStatus, filterProvince]);
+  }, [rows, filterStatus, filterProvince, hasTransportFilter, canRelocateFilter]);
 
   const sortedRows = useMemo(() => {
     return [...filteredRows].sort((a, b) => {
@@ -169,6 +222,41 @@ export function AdminPage() {
   }, [filterStatus, filterProvince, sortKey, sortAsc, rows]);
 
   const topCandidates = useMemo(() => sortedRows.slice(0, 3), [sortedRows]);
+  const [statusOverrides, setStatusOverrides] = useState<Record<string, ScreeningStatus | ''>>({});
+
+  const demographics = useMemo(() => {
+    const total = rows.length;
+    const genderCounts = rows.reduce((acc: Record<string, number>, r) => {
+      const g = (r.gender || 'Unknown').toLowerCase();
+      acc[g] = (acc[g] || 0) + 1;
+      return acc;
+    }, {} as Record<string, number>);
+    const female = genderCounts['female'] || 0;
+    const male = genderCounts['male'] || 0;
+
+    const provinceCounts = rows.reduce((acc: Record<string, number>, r) => {
+      const p = (r.province || 'Unknown');
+      acc[p] = (acc[p] || 0) + 1;
+      return acc;
+    }, {} as Record<string, number>);
+    const topProvince = Object.entries(provinceCounts).sort((a, b) => b[1] - a[1])[0]?.[0] || '—';
+
+    const raceCounts = rows.reduce((acc: Record<string, number>, r) => {
+      const ra = (r.race || 'Unknown');
+      acc[ra] = (acc[ra] || 0) + 1;
+      return acc;
+    }, {} as Record<string, number>);
+    const topRace = Object.entries(raceCounts).sort((a, b) => b[1] - a[1])[0]?.[0] || '—';
+
+    return {
+      total,
+      female,
+      male,
+      genderPercent: total > 0 ? Math.round((female / total) * 100) : 0,
+      topProvince,
+      topRace,
+    };
+  }, [rows]);
 
   const handleGenerateNewsletter = async () => {
     if (!prompt.trim()) return;
@@ -216,28 +304,52 @@ export function AdminPage() {
           </div>
         </div>
 
-        {/* Top Candidates Preview */}
+        {/* Demographics Overview */}
         <div className="mb-8">
-          <div className="flex items-center justify-between mb-4">
-            <h3 className="text-lg font-semibold text-white">Future Top Candidates</h3>
-            <p className="text-sm text-slate-400">Model preview — horizontally scroll to browse</p>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+            <div className="rounded-2xl bg-slate-900/80 p-6 border border-white/10">
+              <p className="text-sm text-slate-300">Total Screened</p>
+              <p className="mt-2 text-2xl font-bold text-white">{demographics.total}</p>
+            </div>
+            <div className="rounded-2xl bg-slate-900/80 p-6 border border-white/10">
+              <p className="text-sm text-slate-300">Gender Split</p>
+              <p className="mt-2 text-2xl font-bold text-white">{demographics.genderPercent}% Female</p>
+              <p className="text-sm text-slate-400">{demographics.male} Male • {demographics.female} Female</p>
+            </div>
+            <div className="rounded-2xl bg-slate-900/80 p-6 border border-white/10">
+              <p className="text-sm text-slate-300">Top Province</p>
+              <p className="mt-2 text-2xl font-bold text-white">{demographics.topProvince}</p>
+            </div>
+            <div className="rounded-2xl bg-slate-900/80 p-6 border border-white/10">
+              <p className="text-sm text-slate-300">Top Race</p>
+              <p className="mt-2 text-2xl font-bold text-white">{demographics.topRace}</p>
+            </div>
           </div>
-          <div className="flex flex-row overflow-x-auto gap-4 pb-4 snap-x">
-            {topCandidates.map((candidate, idx) => (
-              <div key={`${candidate.fullName}-${idx}`} className="min-w-[280px] snap-start">
-                <Card className="bg-slate-900/95 border-white/10 p-6">
-                  <div className="flex items-center gap-3 text-[#f97316] mb-4">
-                    <span className="inline-flex h-10 w-10 items-center justify-center rounded-2xl bg-[#f97316]/10">{idx + 1}</span>
-                    <div>
-                      <p className="text-sm uppercase tracking-[0.18em] text-slate-400">Future top candidate</p>
-                      <p className="text-base font-semibold text-white">{candidate.fullName || 'Candidate'}</p>
+
+          {/* Top Candidates (horiz scroll) */}
+          <div className="mb-6">
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-lg font-semibold text-white">Future Top Candidates</h3>
+              <p className="text-sm text-slate-400">Model preview — horizontally scroll to browse</p>
+            </div>
+            <div className="flex flex-row overflow-x-auto gap-4 pb-4 snap-x">
+              {topCandidates.map((candidate, idx) => (
+                <div key={`${candidate.fullName}-${idx}`} className="min-w-[280px] snap-start">
+                  <Card className="bg-slate-900/95 border-white/10 p-6">
+                    <div className="flex items-center gap-3 text-[#f97316] mb-4">
+                      <span className="inline-flex h-10 w-10 items-center justify-center rounded-2xl bg-[#f97316]/10">{idx + 1}</span>
+                      <div>
+                        <p className="text-sm uppercase tracking-[0.18em] text-slate-400">Future top candidate</p>
+                        <p className="text-base font-semibold text-white">{candidate.fullName || 'Candidate'}</p>
+                      </div>
                     </div>
-                  </div>
-                  <p className="text-sm text-slate-400 leading-relaxed">This preview card illustrates how the model will rank the strongest candidates once attachment analysis is available.</p>
-                </Card>
-              </div>
-            ))}
+                    <p className="text-sm text-slate-400 leading-relaxed">This preview card illustrates how the model will rank the strongest candidates once attachment analysis is available.</p>
+                  </Card>
+                </div>
+              ))}
+            </div>
           </div>
+
         </div>
 
         <section className="grid gap-8 lg:grid-cols-[2.2fr_0.8fr]">
@@ -246,21 +358,42 @@ export function AdminPage() {
               <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
                 <div>
                   <h2 className="text-2xl font-bold text-white">Candidate Auto-Screener</h2>
-                  <p className="mt-2 text-slate-400">Sortable roster of current candidates with screening status computed from their submission data.</p>
                 </div>
-                <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
-                  <select value={filterStatus} onChange={(e) => setFilterStatus(e.target.value as any)} className="rounded-2xl bg-slate-900/70 px-4 py-2 text-sm text-slate-100">
-                    <option value="All">All Statuses</option>
-                    <option value="Eligible">Eligible</option>
-                    <option value="Requires Follow-Up">Requires Follow-Up</option>
-                    <option value="Not Eligible">Not Eligible</option>
-                  </select>
-                  <select value={filterProvince} onChange={(e) => setFilterProvince(e.target.value)} className="rounded-2xl bg-slate-900/70 px-4 py-2 text-sm text-slate-100">
-                    <option value="All">All Provinces</option>
-                    {[...new Set(rows.map((r) => r.province).filter(Boolean))].map((p) => (
-                      <option key={p} value={p}>{p}</option>
-                    ))}
-                  </select>
+                <div className="flex items-center gap-3">
+                  {/* Smart Filters */}
+                  <div className="flex items-center gap-2">
+                    <button
+                      type="button"
+                      onClick={() => setHasTransportFilter((s) => !s)}
+                      className={`inline-flex items-center gap-2 rounded-full px-3 py-2 text-sm font-semibold transition ${hasTransportFilter ? 'bg-[#f97316] text-white' : 'bg-slate-900/70 text-slate-200 border border-white/5'}`}
+                    >
+                      <Car className="h-4 w-4" />
+                      <span>Has Transport</span>
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setCanRelocateFilter((s) => !s)}
+                      className={`inline-flex items-center gap-2 rounded-full px-3 py-2 text-sm font-semibold transition ${canRelocateFilter ? 'bg-[#f97316] text-white' : 'bg-slate-900/70 text-slate-200 border border-white/5'}`}
+                    >
+                      <MapPin className="h-4 w-4" />
+                      <span>Can Relocate</span>
+                    </button>
+                  </div>
+
+                  <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
+                    <select value={filterStatus} onChange={(e) => setFilterStatus(e.target.value as any)} className="rounded-2xl bg-slate-900/70 px-4 py-2 text-sm text-slate-100">
+                      <option value="All">All Statuses</option>
+                      <option value="Eligible">Eligible</option>
+                      <option value="Requires Follow-Up">Requires Follow-Up</option>
+                      <option value="Not Eligible">Not Eligible</option>
+                    </select>
+                    <select value={filterProvince} onChange={(e) => setFilterProvince(e.target.value)} className="rounded-2xl bg-slate-900/70 px-4 py-2 text-sm text-slate-100">
+                      <option value="All">All Provinces</option>
+                      {[...new Set(rows.map((r) => r.province).filter(Boolean))].map((p) => (
+                        <option key={p} value={p}>{p}</option>
+                      ))}
+                    </select>
+                  </div>
                 </div>
               </div>
 
@@ -315,7 +448,10 @@ export function AdminPage() {
                     </thead>
                     <tbody>
                       {pageRows.map((row, index) => {
-                        const status = autoScreener(row);
+                        const key = row.idNumber || `${row.fullName}-${index}`;
+                        const overridden = (statusOverrides[key] ?? '') as ScreeningStatus | '';
+                        const auto = autoScreener(row);
+                        const status = overridden !== '' ? overridden : auto;
                         return (
                           <tr key={`${row.fullName}-${index}`} className="border-b border-white/10 text-sm text-slate-200 hover:bg-slate-900/80">
                             <td className="px-5 py-4">{row.fullName || 'Unknown'}</td>
@@ -324,10 +460,24 @@ export function AdminPage() {
                             <td className="px-5 py-4">{row.gender || '—'}</td>
                             <td className="px-5 py-4">{row.race || '—'}</td>
                             <td className="px-5 py-4">{row.disability || '—'}</td>
-                            <td className="px-5 py-4">
+                            <td className="px-5 py-4 flex items-center gap-3">
                               <span className={`inline-flex rounded-full px-3 py-1 text-xs font-semibold ${statusStyles[status]}`}>
                                 {status}
                               </span>
+                              <select
+                                value={overridden ?? ''}
+                                onChange={(e) => {
+                                  const val = e.target.value as ScreeningStatus | '';
+                                  setStatusOverrides((s) => ({ ...s, [key]: val }));
+                                }}
+                                className="rounded-md bg-slate-900/70 text-xs text-slate-200 px-2 py-1"
+                                aria-label="Status override"
+                              >
+                                <option value="">Auto</option>
+                                <option value="Eligible">Eligible</option>
+                                <option value="Requires Follow-Up">Requires Follow-Up</option>
+                                <option value="Not Eligible">Not Eligible</option>
+                              </select>
                             </td>
                             <td className="px-5 py-4">
                               {row.attachmentLink ? (

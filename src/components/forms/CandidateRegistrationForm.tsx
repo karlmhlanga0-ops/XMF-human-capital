@@ -34,6 +34,8 @@ interface CandidateFormValues {
   idDocument?: FileList;
   cv?: FileList;
   qualifications?: FileList;
+  sarsLetter?: FileList;
+  bankConfirmationLetter?: FileList;
   popiaConsent: boolean;
 }
 
@@ -69,7 +71,7 @@ export function CandidateRegistrationForm() {
       return;
     }
 
-    const WEBHOOK_URL = 'https://script.google.com/macros/s/AKfycbxp6G21cuRBy6SE5nT1mglnz6rS0Y-MBMKBX9XsvpV7yVe7Hx8uStn6hXD-NvyVaasE/exec';
+    const WEBHOOK_URL = '/api/submit-candidate';
 
     const fileToBase64 = (file: File): Promise<{ base64: string; mimeType: string; name: string }> =>
       new Promise((resolve, reject) => {
@@ -88,7 +90,7 @@ export function CandidateRegistrationForm() {
 
       Object.entries(data).forEach(([key, value]) => {
         if (key === 'popiaConsent') payload[key] = value ? 'Yes' : 'No';
-        else if (key !== 'idDocument' && key !== 'cv' && key !== 'qualifications') payload[key] = String(value ?? '');
+        else if (key !== 'idDocument' && key !== 'cv' && key !== 'qualifications' && key !== 'sarsLetter' && key !== 'bankConfirmationLetter') payload[key] = String(value ?? '');
       });
 
       if (data.idDocument && data.idDocument.length > 0) {
@@ -104,13 +106,26 @@ export function CandidateRegistrationForm() {
           payload.files.qualifications.push(await fileToBase64(data.qualifications[i]));
         }
       }
+      if (data.sarsLetter && data.sarsLetter.length > 0) {
+        payload.files.sarsLetter = await fileToBase64(data.sarsLetter[0]);
+      }
+      if (data.bankConfirmationLetter && data.bankConfirmationLetter.length > 0) {
+        payload.files.bankConfirmationLetter = await fileToBase64(data.bankConfirmationLetter[0]);
+      }
 
-      await fetch(WEBHOOK_URL, {
+      const resp = await fetch(WEBHOOK_URL, {
         method: 'POST',
-        mode: 'no-cors',
-        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload),
       });
+
+      const json = await resp.json().catch(() => null);
+      if (!resp.ok || json?.status === 'error') {
+        const message = json?.message || 'Submission failed. Please try again.';
+        setSubmitError(message);
+        setIsSubmitting(false);
+        return;
+      }
 
       setSubmitted(true);
       reset();
@@ -152,7 +167,7 @@ export function CandidateRegistrationForm() {
       const payload: any = { formType: 'Candidate', files: {} };
       Object.entries(data).forEach(([key, value]) => {
         if (key === 'popiaConsent') payload[key] = value ? 'Yes' : 'No';
-        else if (key !== 'idDocument' && key !== 'cv' && key !== 'qualifications') payload[key] = String(value ?? '');
+        else if (key !== 'idDocument' && key !== 'cv' && key !== 'qualifications' && key !== 'sarsLetter' && key !== 'bankConfirmationLetter') payload[key] = String(value ?? '');
       });
 
       if (data.idDocument && data.idDocument.length > 0) {
@@ -168,13 +183,24 @@ export function CandidateRegistrationForm() {
           payload.files.qualifications.push(await fileToBase64(data.qualifications[i]));
         }
       }
+      if (data.sarsLetter && data.sarsLetter.length > 0) {
+        payload.files.sarsLetter = await fileToBase64(data.sarsLetter[0]);
+      }
+      if (data.bankConfirmationLetter && data.bankConfirmationLetter.length > 0) {
+        payload.files.bankConfirmationLetter = await fileToBase64(data.bankConfirmationLetter[0]);
+      }
 
-      await fetch(WEBHOOK_URL, {
+      const resp = await fetch(WEBHOOK_URL, {
         method: 'POST',
-        mode: 'no-cors',
-        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload),
       });
+      const json = await resp.json().catch(() => null);
+      if (!resp.ok || json?.status === 'error') {
+        setSubmitError(json?.message || 'Submission failed.');
+        setIsSubmitting(false);
+        return;
+      }
 
       setSubmitted(true);
       reset();
@@ -436,12 +462,8 @@ export function CandidateRegistrationForm() {
               </FormField>
             </div>
 
-            <div className="rounded-3xl border border-slate-200 bg-slate-100 p-6">
-              <p className="text-slate-900 font-semibold">Files too large or need splitting? Use <a href="https://www.ilovepdf.com/split_pdf" target="_blank" rel="noreferrer" className="text-slate-900 underline">iLovePDF</a> before uploading.</p>
-            </div>
-
             {/* Employment Equity & Compliance Section */}
-            <div className="rounded-3xl border border-slate-200 bg-slate-200 p-6">
+            <div className="rounded-3xl border border-slate-200 bg-slate-100 p-6">
               <h3 className="text-lg font-semibold text-slate-900 mb-4">Employment Equity & Compliance</h3>
               <p className="text-sm text-slate-700 mb-6">Your race and disability information is voluntary and helps us place you in equity-aligned roles.</p>
               <div className="grid gap-4 lg:grid-cols-2">
@@ -465,11 +487,11 @@ export function CandidateRegistrationForm() {
                     <div className="flex gap-6 items-center mt-2">
                       <label className="flex items-center gap-2 text-slate-900">
                         <input type="radio" value="Yes" {...register('disability')} />
-                        <span className="text-sm">Yes</span>
+                        <span className="text-sm text-slate-900">Yes</span>
                       </label>
                       <label className="flex items-center gap-2 text-slate-900">
                         <input type="radio" value="No" defaultChecked {...register('disability')} />
-                        <span className="text-sm">No</span>
+                        <span className="text-sm text-slate-900">No</span>
                       </label>
                     </div>
                     {watch('disability') === 'Yes' && (
@@ -482,8 +504,10 @@ export function CandidateRegistrationForm() {
                 </div>
               </div>
             </div>
-
-            <div className="grid gap-8 lg:grid-cols-3">
+                     <div className="rounded-3xl border border-slate-200 bg-slate-100 p-6">
+              <p className="text-slate-900 font-semibold">Files too large or need splitting? Use <a href="https://www.ilovepdf.com/split_pdf" target="_blank" rel="noreferrer" className="text-slate-900 underline">iLovePDF</a> before uploading.</p>
+            </div>
+            <div className="grid gap-8 lg:grid-cols-2">
               <FormField>
                 <FormLabel htmlFor="idDocument" className="text-slate-700 font-semibold">ID Document</FormLabel>
                 <FormControl>
@@ -507,6 +531,22 @@ export function CandidateRegistrationForm() {
                 </FormControl>
                 {errors.qualifications && <FormMessage className="text-red-500">{String(errors.qualifications.message)}</FormMessage>}
                 <p className="text-xs text-slate-500 mt-1">Attach individual qualification files or a combined archive.</p>
+              </FormField>
+
+              <FormField>
+                <FormLabel htmlFor="sarsLetter" className="text-slate-700 font-semibold">SARS Letter</FormLabel>
+                <FormControl>
+                  <Input id="sarsLetter" type="file" accept=".pdf,.jpg,.png" className={`${inputBaseClass} file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-[#f97316]/10 file:text-[#f97316] hover:file:bg-[#f97316]/20`} {...register('sarsLetter', { required: 'SARS Letter is required' })} />
+                </FormControl>
+                {errors.sarsLetter && <FormMessage className="text-red-500">{String(errors.sarsLetter.message)}</FormMessage>}
+              </FormField>
+
+              <FormField>
+                <FormLabel htmlFor="bankConfirmationLetter" className="text-slate-700 font-semibold">Bank Confirmation Letter</FormLabel>
+                <FormControl>
+                  <Input id="bankConfirmationLetter" type="file" accept=".pdf,.jpg,.png" className={`${inputBaseClass} file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-[#f97316]/10 file:text-[#f97316] hover:file:bg-[#f97316]/20`} {...register('bankConfirmationLetter', { required: 'Bank confirmation letter is required' })} />
+                </FormControl>
+                {errors.bankConfirmationLetter && <FormMessage className="text-red-500">{String(errors.bankConfirmationLetter.message)}</FormMessage>}
               </FormField>
             </div>
 

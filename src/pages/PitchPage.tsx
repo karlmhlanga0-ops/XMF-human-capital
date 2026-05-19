@@ -116,12 +116,12 @@ const slides = [
 ];
 
 export function PitchPage() {
-  const [index, setIndex] = useState(0);
+  const [currentSlide, setCurrentSlide] = useState(0);
   const [direction, setDirection] = useState(0);
 
   useEffect(() => {
     const handleKey = (e: KeyboardEvent) => {
-      if (e.key === 'ArrowRight' || e.key === ' ') {
+      if (e.key === 'ArrowRight' || e.code === 'Space') {
         next();
       } else if (e.key === 'ArrowLeft') {
         prev();
@@ -129,15 +129,15 @@ export function PitchPage() {
     };
     window.addEventListener('keydown', handleKey);
     return () => window.removeEventListener('keydown', handleKey);
-  }, [index]);
+  }, [currentSlide]);
 
   const next = () => {
     setDirection(1);
-    setIndex((i) => Math.min(slides.length - 1, i + 1));
+    setCurrentSlide((i) => Math.min(slides.length - 1, i + 1));
   };
   const prev = () => {
     setDirection(-1);
-    setIndex((i) => Math.max(0, i - 1));
+    setCurrentSlide((i) => Math.max(0, i - 1));
   };
 
   const variants = {
@@ -166,7 +166,7 @@ export function PitchPage() {
       <div className="absolute inset-0 flex items-center justify-center">
         <AnimatePresence initial={false} custom={direction}>
           <motion.div
-            key={slides[index].id}
+            key={slides[currentSlide].id}
             custom={direction}
             variants={variants}
             initial="enter"
@@ -174,21 +174,21 @@ export function PitchPage() {
             exit="exit"
             transition={{ duration: 0.6, ease: 'easeInOut' }}
             className="w-full h-screen flex items-center justify-center"
-            style={{ backgroundImage: `linear-gradient(rgba(8,11,25,0.84), rgba(8,11,25,0.84)), url('${slides[index].image}')`, backgroundSize: 'cover', backgroundPosition: 'center' }}
+            style={{ backgroundImage: `linear-gradient(rgba(8,11,25,0.84), rgba(8,11,25,0.84)), url('${slides[currentSlide].image}')`, backgroundSize: 'cover', backgroundPosition: 'center' }}
           >
             <div className="mx-auto max-w-[1240px] px-6 py-20">
               <div className="grid w-full gap-10 lg:grid-cols-[0.65fr_0.35fr] lg:items-center">
                 <div className="space-y-8">
                   <div className="inline-flex items-center gap-3 rounded-full bg-[#f97316]/10 px-4 py-2 text-sm font-semibold uppercase tracking-[0.25em] text-[#f97316]">
                     <Layers className="h-4 w-4" />
-                    Slide {index + 1} of {slides.length}
+                    Slide {currentSlide + 1} of {slides.length}
                   </div>
                   <div className="space-y-6">
-                    <h2 className="text-4xl font-bold tracking-tight text-white sm:text-5xl">{slides[index].title}</h2>
-                    <p className="max-w-3xl text-lg leading-8 text-slate-300">{slides[index].subtitle}</p>
+                    <h2 className="text-4xl font-bold tracking-tight text-white sm:text-5xl">{slides[currentSlide].title}</h2>
+                    <p className="max-w-3xl text-lg leading-8 text-slate-300">{slides[currentSlide].subtitle}</p>
                   </div>
                   <div className="grid gap-4 sm:grid-cols-2">
-                    {slides[index].bullets.map((b) => (
+                    {slides[currentSlide].bullets.map((b) => (
                       <div key={b} className="rounded-[2rem] border border-white/10 bg-slate-950/80 p-6 shadow-xl shadow-black/20">
                         <p className="text-sm font-semibold uppercase tracking-[0.2em] text-slate-400">Key point</p>
                         <p className="mt-3 text-base text-slate-200">{b}</p>
@@ -204,11 +204,11 @@ export function PitchPage() {
                     </div>
                     <div>
                       <p className="text-sm uppercase tracking-[0.25em] text-slate-400">Presentation highlight</p>
-                      <p className="text-xl font-semibold text-white">{slides[index].title}</p>
+                      <p className="text-xl font-semibold text-white">{slides[currentSlide].title}</p>
                     </div>
                   </div>
                   <div className="rounded-3xl bg-slate-950/95 p-6 text-slate-300">
-                    <p>{slides[index].bullets[0]}</p>
+                    <p>{slides[currentSlide].bullets[0]}</p>
                     <p className="mt-4 text-sm text-slate-400">This deck is built to showcase both product capability and commercial impact.</p>
                   </div>
                   <div className="grid gap-3 sm:grid-cols-2">
@@ -223,11 +223,11 @@ export function PitchPage() {
       </div>
 
       <div className="fixed inset-x-0 bottom-0 z-50 border-t border-white/10 bg-slate-950/95 px-6 py-4 backdrop-blur-xl">
-        <div className="mx-auto flex max-w-[1240px] items-center justify-between gap-4">
-          <div className="text-sm text-slate-300">{slides[index].title} — {index + 1}/{slides.length}</div>
+          <div className="mx-auto flex max-w-[1240px] items-center justify-between gap-4">
+          <div className="text-sm text-slate-300">{slides[currentSlide].title} — {currentSlide + 1}/{slides.length}</div>
           <div className="flex items-center gap-3">
-            <button type="button" onClick={prev} disabled={index === 0} className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-slate-900/90 px-4 py-3 text-sm text-slate-200 transition hover:bg-slate-800 disabled:cursor-not-allowed disabled:opacity-50"><ChevronLeft className="h-4 w-4" /> Previous</button>
-            <button type="button" onClick={next} disabled={index === slides.length - 1} className="inline-flex items-center gap-2 rounded-full bg-[#f97316] px-4 py-3 text-sm font-semibold text-white transition hover:bg-[#ea680a] disabled:cursor-not-allowed disabled:opacity-50">Next <ChevronRight className="h-4 w-4" /></button>
+            <button type="button" onClick={prev} disabled={currentSlide === 0} className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-slate-900/90 px-4 py-3 text-sm text-slate-200 transition hover:bg-slate-800 disabled:cursor-not-allowed disabled:opacity-50"><ChevronLeft className="h-4 w-4" /> Previous</button>
+            <button type="button" onClick={next} disabled={currentSlide === slides.length - 1} className="inline-flex items-center gap-2 rounded-full bg-[#f97316] px-4 py-3 text-sm font-semibold text-white transition hover:bg-[#ea680a] disabled:cursor-not-allowed disabled:opacity-50">Next <ChevronRight className="h-4 w-4" /></button>
           </div>
         </div>
       </div>

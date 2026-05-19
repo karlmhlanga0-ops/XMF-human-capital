@@ -101,18 +101,30 @@ export function ServicesPage() {
         </div>
       </section>
 
-      {/* Advisory CTA */}
-      <section className="py-16 bg-white">
+      {/* Conversion CTA */}
+      <section className="py-20 bg-gradient-to-r from-[#fff8f3] to-[#fff2e6] border-t border-slate-100">
         <div className="mx-auto max-w-[1240px] px-6 lg:px-8">
-          <div className="rounded-2xl border border-slate-100 bg-white p-8 flex flex-col md:flex-row md:items-center md:justify-between gap-6">
+          <div className="grid gap-10 lg:grid-cols-[1.35fr_0.65fr] items-center">
             <div>
-              <h3 className="text-2xl font-bold text-slate-900">Architect Your Talent Pipeline</h3>
-              <p className="mt-2 text-slate-700 max-w-2xl">Need a custom workforce strategy? Book a 30-minute advisory session with our Managing Director to build a compliant, high-performing talent pipeline from the ground up.</p>
+              <p className="text-sm font-semibold uppercase tracking-[0.2em] text-[#D76A36]">Architect Your Talent Pipeline</p>
+              <h2 className="text-3xl md:text-4xl font-bold text-slate-900 mt-3">Bring structure to your hiring funnel and convert interest into hires.</h2>
+              <p className="mt-4 text-slate-700 max-w-2xl">Book a focused advisory session to design a conversion-first pipeline, improve candidate experience, and ensure compliance for placements.</p>
+              <div className="mt-6 flex gap-4">
+                <Link to="/advisory" className="inline-flex">
+                  <button className="bg-[#D76A36] hover:bg-[#c25a29] text-white px-6 py-4 rounded-2xl font-semibold shadow-lg shadow-[#D76A36]/20">Book Advisory</button>
+                </Link>
+                <Link to="/contact" className="inline-flex">
+                  <button className="bg-white border border-slate-200 px-6 py-4 rounded-2xl text-slate-900">Request Pricing</button>
+                </Link>
+              </div>
             </div>
-            <div>
-              <Link to="/advisory" className="">
-                <button className="bg-[#D76A36] hover:bg-[#c25a29] text-white px-6 py-4 rounded-md">Book an Advisory Session</button>
-              </Link>
+            <div className="rounded-2xl border border-[#FDE3CE] bg-white p-8 shadow-lg">
+              <h4 className="text-sm font-semibold text-[#D76A36] uppercase">Conversion Booster</h4>
+              <ul className="mt-4 space-y-3 text-slate-700">
+                <li>Optimised candidate funnel with clear CTAs</li>
+                <li>Compliance-aware intake to reduce friction</li>
+                <li>High-touch employer outreach to close deals</li>
+              </ul>
             </div>
           </div>
         </div>
