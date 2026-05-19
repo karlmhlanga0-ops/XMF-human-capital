@@ -91,8 +91,8 @@ export function EmployerPartnershipForm() {
     }
   };
 
-  // Base class forces text-slate-900. 
-const inputBaseClass = "bg-slate-50 border-slate-300 !text-slate-900 placeholder:!text-slate-500 focus:bg-white focus:border-[#D76A36] focus:ring-[#D76A36]/20 h-12 font-medium w-full";
+  // Base class forces high-contrast text and border.
+const inputBaseClass = "bg-slate-50 border-slate-400 !text-slate-900 placeholder:!text-slate-500 focus:bg-white focus:border-[#D76A36] focus:ring-[#D76A36]/20 h-12 font-medium w-full rounded-2xl px-4";
   return (
     <div className="bg-white rounded-[2rem] border border-slate-200 p-8 md:p-12 shadow-xl shadow-slate-200/50 relative overflow-hidden">
       
@@ -115,11 +115,12 @@ const inputBaseClass = "bg-slate-50 border-slate-300 !text-slate-900 placeholder
 
       {!submitted ? (
         <Form onSubmit={handleSubmit(onSubmit)}>
+          <div className="space-y-10">
           <div className="grid gap-8 lg:grid-cols-2 relative z-10">
             
             {/* ... standard inputs ... */}
             <FormField>
-              <FormLabel htmlFor="organisationName" className="text-slate-700 font-semibold">Organisation Name</FormLabel>
+              <FormLabel htmlFor="organisationName" className="text-slate-900 font-semibold">Organisation Name</FormLabel>
               <FormControl>
                 <Input id="organisationName" placeholder="Example Holdings" className={inputBaseClass} {...register('organisationName', { required: true })} />
               </FormControl>
@@ -127,7 +128,7 @@ const inputBaseClass = "bg-slate-50 border-slate-300 !text-slate-900 placeholder
             </FormField>
 
             <FormField>
-              <FormLabel htmlFor="industrySector" className="text-slate-700 font-semibold">Industry Sector</FormLabel>
+              <FormLabel htmlFor="industrySector" className="text-slate-900 font-semibold">Industry Sector</FormLabel>
               <FormControl>
                 <Input id="industrySector" placeholder="Financial Services" className={inputBaseClass} {...register('industrySector', { required: true })} />
               </FormControl>
@@ -135,7 +136,7 @@ const inputBaseClass = "bg-slate-50 border-slate-300 !text-slate-900 placeholder
             </FormField>
 
             <FormField>
-              <FormLabel htmlFor="contactPerson" className="text-slate-700 font-semibold">Contact Person (Full Name)</FormLabel>
+              <FormLabel htmlFor="contactPerson" className="text-slate-900 font-semibold">Contact Person (Full Name)</FormLabel>
               <FormControl>
                 <Input id="contactPerson" placeholder="Thabo Mokoena" className={inputBaseClass} {...register('contactPerson', { required: true })} />
               </FormControl>
@@ -143,7 +144,7 @@ const inputBaseClass = "bg-slate-50 border-slate-300 !text-slate-900 placeholder
             </FormField>
 
             <FormField>
-              <FormLabel htmlFor="jobTitle" className="text-slate-700 font-semibold">Job Title</FormLabel>
+              <FormLabel htmlFor="jobTitle" className="text-slate-900 font-semibold">Job Title</FormLabel>
               <FormControl>
                 <Input id="jobTitle" placeholder="HR Manager" className={inputBaseClass} {...register('jobTitle', { required: true })} />
               </FormControl>
@@ -151,7 +152,7 @@ const inputBaseClass = "bg-slate-50 border-slate-300 !text-slate-900 placeholder
             </FormField>
 
             <FormField>
-              <FormLabel htmlFor="emailAddress" className="text-slate-700 font-semibold">Email Address</FormLabel>
+              <FormLabel htmlFor="emailAddress" className="text-slate-900 font-semibold">Email Address</FormLabel>
               <FormControl>
                 <Input id="emailAddress" type="email" placeholder="contact@company.co.za" className={inputBaseClass} {...register('emailAddress', { required: true })} />
               </FormControl>
@@ -159,7 +160,7 @@ const inputBaseClass = "bg-slate-50 border-slate-300 !text-slate-900 placeholder
             </FormField>
 
             <FormField>
-              <FormLabel htmlFor="phoneNumber" className="text-slate-700 font-semibold">Phone Number</FormLabel>
+              <FormLabel htmlFor="phoneNumber" className="text-slate-900 font-semibold">Phone Number</FormLabel>
               <FormControl>
                 <Input id="phoneNumber" type="tel" placeholder="+27 11 123 4567" className={inputBaseClass} {...register('phoneNumber', { required: true })} />
               </FormControl>
@@ -167,7 +168,7 @@ const inputBaseClass = "bg-slate-50 border-slate-300 !text-slate-900 placeholder
             </FormField>
 
             <FormField>
-              <FormLabel htmlFor="provinceLocation" className="text-slate-700 font-semibold">Province / Location</FormLabel>
+              <FormLabel htmlFor="provinceLocation" className="text-slate-900 font-semibold">Province / Location</FormLabel>
               <FormControl>
                 <Input id="provinceLocation" placeholder="Western Cape" className={inputBaseClass} {...register('provinceLocation', { required: true })} />
               </FormControl>
@@ -176,10 +177,10 @@ const inputBaseClass = "bg-slate-50 border-slate-300 !text-slate-900 placeholder
 
             {/* Fixed Checkbox Sizing */}
             <FormField className="lg:col-span-2">
-              <FormLabel className="text-slate-700 font-semibold block mb-4">Type of Support Required</FormLabel>
+              <FormLabel className="text-slate-900 font-semibold block mb-4">Type of Support Required</FormLabel>
               <div className="grid gap-3 sm:grid-cols-2">
                 {supportOptions.map((option) => (
-                  <Label key={option} className="flex items-center gap-3 rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-700 transition hover:border-[#1E254C]/40 cursor-pointer">
+                  <Label key={option} className="flex items-center gap-3 rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-900 transition hover:border-[#1E254C]/40 cursor-pointer">
                     <Checkbox value={option} className="h-5 w-5 shrink-0 border-slate-300 text-[#D76A36] focus:ring-[#D76A36] bg-white" {...register('supportRequired')} />
                     <span className="font-medium">{option}</span>
                   </Label>
@@ -189,7 +190,7 @@ const inputBaseClass = "bg-slate-50 border-slate-300 !text-slate-900 placeholder
             </FormField>
 
             <FormField>
-              <FormLabel htmlFor="estimatedNumber" className="text-slate-700 font-semibold">Estimated Number of Candidates</FormLabel>
+              <FormLabel htmlFor="estimatedNumber" className="text-slate-900 font-semibold">Estimated Number of Candidates</FormLabel>
               <FormControl>
                 <Input id="estimatedNumber" placeholder="e.g. 20" className={inputBaseClass} {...register('estimatedNumber', { required: true })} />
               </FormControl>
@@ -197,7 +198,7 @@ const inputBaseClass = "bg-slate-50 border-slate-300 !text-slate-900 placeholder
             </FormField>
 
             <FormField>
-              <FormLabel htmlFor="programmeRoleType" className="text-slate-700 font-semibold">Programme / Role Type</FormLabel>
+              <FormLabel htmlFor="programmeRoleType" className="text-slate-900 font-semibold">Programme / Role Type</FormLabel>
               <FormControl>
                 <Input id="programmeRoleType" placeholder="Graduate programme / Learnership" className={inputBaseClass} {...register('programmeRoleType', { required: true })} />
               </FormControl>
@@ -206,18 +207,18 @@ const inputBaseClass = "bg-slate-50 border-slate-300 !text-slate-900 placeholder
 
             {/* FIXED: Date Input styling */}
             <FormField>
-              <FormLabel htmlFor="preferredStartDate" className="text-slate-700 font-semibold">Preferred Start Date</FormLabel>
-              <FormControl>
-                <Input id="preferredStartDate" type="date" className={`${inputBaseClass} text-slate-900 block`} style={{ color: '#0f172a' }} {...register('preferredStartDate', { required: true })} />
-              </FormControl>
+              <FormLabel htmlFor="preferredStartDate" className="text-slate-900 font-semibold">Preferred Start Date</FormLabel>
+                <FormControl>
+                  <Input id="preferredStartDate" type="date" className={`${inputBaseClass} text-slate-900`} {...register('preferredStartDate', { required: true })} />
+                </FormControl>
               {errors.preferredStartDate && <FormMessage className="text-red-500">This field is required.</FormMessage>}
             </FormField>
 
             {/* FIXED: Select Input styling */}
             <FormField>
-              <FormLabel htmlFor="bbbeeLink" className="text-slate-700 font-semibold">Linked to Skills / B-BBEE targets?</FormLabel>
-              <FormControl>
-                <Select id="bbbeeLink" defaultValue="" className={`${inputBaseClass} text-slate-900 appearance-none`} style={{ color: '#0f172a' }} {...register('bbbeeLink', { required: true })}>
+              <FormLabel htmlFor="bbbeeLink" className="text-slate-900 font-semibold">Linked to Skills / B-BBEE targets?</FormLabel>
+                <FormControl>
+                  <Select id="bbbeeLink" defaultValue="" className={`${inputBaseClass} text-slate-900 appearance-none`} {...register('bbbeeLink', { required: true })}>
                   <option value="" disabled className="text-slate-500">Select option</option>
                   <option value="Yes" className="text-slate-900">Yes</option>
                   <option value="No" className="text-slate-900">No</option>
@@ -228,7 +229,7 @@ const inputBaseClass = "bg-slate-50 border-slate-300 !text-slate-900 placeholder
             </FormField>
 
             <FormField className="lg:col-span-2">
-              <FormLabel htmlFor="additionalInformation" className="text-slate-700 font-semibold">Additional Information</FormLabel>
+              <FormLabel htmlFor="additionalInformation" className="text-slate-900 font-semibold">Additional Information</FormLabel>
               <FormControl>
                 <Textarea id="additionalInformation" placeholder="Please share any context, timelines or candidate profile detail" className={`${inputBaseClass} min-h-[120px] resize-y p-4 text-slate-900`} {...register('additionalInformation')} />
               </FormControl>
@@ -236,9 +237,9 @@ const inputBaseClass = "bg-slate-50 border-slate-300 !text-slate-900 placeholder
 
             {/* FIXED: Select Input styling */}
             <FormField className="lg:col-span-2">
-              <FormLabel htmlFor="preferredNextStep" className="text-slate-700 font-semibold">Preferred Next Step</FormLabel>
-              <FormControl>
-                <Select id="preferredNextStep" defaultValue="" className={`${inputBaseClass} text-slate-900 appearance-none`} style={{ color: '#0f172a' }} {...register('preferredNextStep', { required: true })}>
+              <FormLabel htmlFor="preferredNextStep" className="text-slate-900 font-semibold">Preferred Next Step</FormLabel>
+                <FormControl>
+                  <Select id="preferredNextStep" defaultValue="" className={`${inputBaseClass} text-slate-900 appearance-none`} {...register('preferredNextStep', { required: true })}>
                   <option value="" disabled className="text-slate-500">Select a next step</option>
                   <option value="Introductory Meeting" className="text-slate-900">Introductory Meeting</option>
                   <option value="Proposal Submission" className="text-slate-900">Proposal Submission</option>
@@ -248,6 +249,7 @@ const inputBaseClass = "bg-slate-50 border-slate-300 !text-slate-900 placeholder
               </FormControl>
               {errors.preferredNextStep && <FormMessage className="text-red-500">This field is required.</FormMessage>}
             </FormField>
+          </div>
           </div>
 
           {/* FIXED: Restored Consent Checkbox Layout */}

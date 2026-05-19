@@ -1,14 +1,14 @@
 import { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { Button } from '../ui/button';
-import { Checkbox } from '../ui/checkbox';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '../ui/form';
 import { Input } from '../ui/input';
-import { Label } from '../ui/label';
 import { Select } from '../ui/select';
+import { Label } from '../ui/label';
 
 interface CandidateFormValues {
-  fullName: string;
+  firstName: string;
+  surname: string;
   idNumber: string;
   dateOfBirth: string;
   phoneNumber: string;
@@ -20,12 +20,20 @@ interface CandidateFormValues {
   race?: string;
   highestQualification: string;
   fieldOfStudy: string;
-  employmentStatus: string;
   programmeType: string;
   preferredIndustry: string;
   disability?: string;
-  cv: FileList;
-  certificates: FileList;
+  disabilityDetails?: string;
+  currentlyEmployed?: string;
+  availableStartDate?: string;
+  previousLearnership?: string;
+  previousLearnershipDetails?: string;
+  specialisedField?: string;
+  transportAccess?: string;
+  willingToRelocate?: string;
+  idDocument?: FileList;
+  cv?: FileList;
+  qualifications?: FileList;
   popiaConsent: boolean;
 }
 
@@ -34,102 +42,159 @@ export function CandidateRegistrationForm() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
 
-  const { register, handleSubmit, formState: { errors }, reset } = useForm<CandidateFormValues>({
-    defaultValues: {
-      popiaConsent: false,
-    }
+  const { register, handleSubmit, watch, formState: { errors }, reset } = useForm<CandidateFormValues>({
+    defaultValues: { popiaConsent: false, previousLearnership: 'No', currentlyEmployed: 'No', transportAccess: 'No', willingToRelocate: 'No' },
   });
 
+  const previousLearnership = watch('previousLearnership');
+
   useEffect(() => {
-    if (submitted || submitError) {
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-    }
+    if (submitted || submitError) window.scrollTo({ top: 0, behavior: 'smooth' });
   }, [submitted, submitError]);
 
   const onSubmit = async (data: CandidateFormValues) => {
     setIsSubmitting(true);
     setSubmitError(null);
-    
-    // Ensure this matches your newly deployed Apps Script URL
+    // Consent modal flow handled outside: if race or disability missing, show modal
+    if (!data.race || data.race === '') {
+      setShowConsent(true);
+      setPendingData(data as any);
+      setIsSubmitting(false);
+      return;
+    }
+    if (!data.disability || data.disability === '') {
+      setShowConsent(true);
+      setPendingData(data as any);
+      setIsSubmitting(false);
+      return;
+    }
+
     const WEBHOOK_URL = 'https://script.google.com/macros/s/AKfycbxp6G21cuRBy6SE5nT1mglnz6rS0Y-MBMKBX9XsvpV7yVe7Hx8uStn6hXD-NvyVaasE/exec';
 
-    const fileToBase64 = (file: File): Promise<{base64: string, mimeType: string, name: string}> => {
-      return new Promise((resolve, reject) => {
+    const fileToBase64 = (file: File): Promise<{ base64: string; mimeType: string; name: string }> =>
+      new Promise((resolve, reject) => {
         const reader = new FileReader();
         reader.readAsDataURL(file);
         reader.onload = () => {
-            const result = reader.result as string;
-            const base64String = result.split(',')[1]; 
-            resolve({
-              base64: base64String,
-              mimeType: file.type,
-              name: file.name
-            });
+          const result = reader.result as string;
+          const base64String = result.split(',')[1];
+          resolve({ base64: base64String, mimeType: file.type, name: file.name });
         };
-        reader.onerror = error => reject(error);
+        reader.onerror = (err) => reject(err);
       });
-    };
 
     try {
-      const payload: any = {
-        formType: 'Candidate', 
-        files: [] // Initialize empty array for multiple files
-      };
+      const payload: any = { formType: 'Candidate', files: {} };
 
-      // 1. Process Text Data
-      Object.keys(data).forEach((key) => {
-        const value = data[key as keyof CandidateFormValues];
-        if (key !== 'cv' && key !== 'certificates') {
-           if (key === 'popiaConsent') {
-            payload[key] = value ? 'Yes' : 'No';
-          } else {
-            payload[key] = String(value);
-          }
-        }
+      Object.entries(data).forEach(([key, value]) => {
+        if (key === 'popiaConsent') payload[key] = value ? 'Yes' : 'No';
+        else if (key !== 'idDocument' && key !== 'cv' && key !== 'qualifications') payload[key] = String(value ?? '');
       });
 
-      // 2. Process Files (CV + Multiple Certificates)
-      const filePromises = [];
-
-      // Add CV (Required)
-      if (data.cv && data.cv.length > 0) {
-        filePromises.push(fileToBase64(data.cv[0]));
+      if (data.idDocument && data.idDocument.length > 0) {
+        payload.files.idDocument = await fileToBase64(data.idDocument[0]);
       }
-
-      // Add Certificates (Optional, Multiple)
-      if (data.certificates && data.certificates.length > 0) {
-        for (let i = 0; i < data.certificates.length; i++) {
-          filePromises.push(fileToBase64(data.certificates[i]));
+      if (data.cv && data.cv.length > 0) {
+        payload.files.cv = await fileToBase64(data.cv[0]);
+      }
+      if (data.qualifications && data.qualifications.length > 0) {
+        payload.files.qualifications = [];
+        for (let i = 0; i < data.qualifications.length; i += 1) {
+          // eslint-disable-next-line no-await-in-loop
+          payload.files.qualifications.push(await fileToBase64(data.qualifications[i]));
         }
       }
 
-      // Wait for all files to be encoded
-      const processedFiles = await Promise.all(filePromises);
-      payload.files = processedFiles;
-
-      // 3. Send to Google Apps Script
       await fetch(WEBHOOK_URL, {
-        method: "POST",
-        mode: "no-cors", 
-        headers: { "Content-Type": "text/plain;charset=utf-8" },
+        method: 'POST',
+        mode: 'no-cors',
+        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
         body: JSON.stringify(payload),
       });
 
       setSubmitted(true);
       reset();
-
-    } catch (error) {
-      console.error("Error submitting form", error);
-      setSubmitError("There was an issue connecting to the secure server. Please try submitting again.");
+    } catch (err) {
+      console.error(err);
+      setSubmitError('There was an issue connecting to the secure server. Please try submitting again.');
     } finally {
       setIsSubmitting(false);
     }
   };
 
-const inputBaseClass = "bg-slate-50 border-slate-300 !text-slate-900 placeholder:!text-slate-500 focus:bg-white focus:border-[#D76A36] focus:ring-[#D76A36]/20 h-12 font-medium w-full";
+  const [showConsent, setShowConsent] = useState(false);
+  const [pendingData, setPendingData] = useState<CandidateFormValues | null>(null);
+
+  const confirmProceed = async () => {
+    if (!pendingData) return;
+    setShowConsent(false);
+    setIsSubmitting(true);
+    await onSubmitConfirmed(pendingData);
+  };
+
+  const onSubmitConfirmed = async (data: CandidateFormValues) => {
+    // reuse previous onSubmit logic but bypass consent checks
+    try {
+      const WEBHOOK_URL = 'https://script.google.com/macros/s/AKfycbxp6G21cuRBy6SE5nT1mglnz6rS0Y-MBMKBX9XsvpV7yVe7Hx8uStn6hXD-NvyVaasE/exec';
+
+      const fileToBase64 = (file: File): Promise<{ base64: string; mimeType: string; name: string }> =>
+        new Promise((resolve, reject) => {
+          const reader = new FileReader();
+          reader.readAsDataURL(file);
+          reader.onload = () => {
+            const result = reader.result as string;
+            const base64String = result.split(',')[1];
+            resolve({ base64: base64String, mimeType: file.type, name: file.name });
+          };
+          reader.onerror = (err) => reject(err);
+        });
+
+      const payload: any = { formType: 'Candidate', files: {} };
+      Object.entries(data).forEach(([key, value]) => {
+        if (key === 'popiaConsent') payload[key] = value ? 'Yes' : 'No';
+        else if (key !== 'idDocument' && key !== 'cv' && key !== 'qualifications') payload[key] = String(value ?? '');
+      });
+
+      if (data.idDocument && data.idDocument.length > 0) {
+        payload.files.idDocument = await fileToBase64(data.idDocument[0]);
+      }
+      if (data.cv && data.cv.length > 0) {
+        payload.files.cv = await fileToBase64(data.cv[0]);
+      }
+      if (data.qualifications && data.qualifications.length > 0) {
+        payload.files.qualifications = [];
+        for (let i = 0; i < data.qualifications.length; i += 1) {
+          // eslint-disable-next-line no-await-in-loop
+          payload.files.qualifications.push(await fileToBase64(data.qualifications[i]));
+        }
+      }
+
+      await fetch(WEBHOOK_URL, {
+        method: 'POST',
+        mode: 'no-cors',
+        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+        body: JSON.stringify(payload),
+      });
+
+      setSubmitted(true);
+      reset();
+    } catch (err) {
+      console.error(err);
+      setSubmitError('There was an issue connecting to the secure server. Please try submitting again.');
+    } finally {
+      setIsSubmitting(false);
+      setPendingData(null);
+    }
+  };
+
+  const inputBaseClass =
+    'bg-slate-50 border border-slate-400 text-slate-900 placeholder-slate-500 focus:bg-white focus:border-[#f97316] focus:ring-[#f97316]/20 h-12 font-medium w-full rounded-2xl px-4';
+
+  const idNumberValidation = (value: string) => (/^\d{13}$/.test(value) ? true : 'ID Number must be exactly 13 digits');
+
   return (
     <div className="bg-white rounded-[2rem] border border-slate-200 p-8 md:p-12 shadow-xl shadow-slate-200/50 relative overflow-hidden">
-      <div className="absolute top-0 right-0 w-64 h-64 bg-[#D76A36]/5 rounded-full blur-3xl -mr-20 -mt-20 pointer-events-none"></div>
+      <div className="absolute top-0 right-0 w-64 h-64 bg-[#f97316]/10 rounded-full blur-3xl -mr-20 -mt-20 pointer-events-none" />
 
       {submitError && (
         <div className="mb-8 rounded-xl border border-red-200 bg-red-50 p-4 text-red-800">
@@ -138,252 +203,330 @@ const inputBaseClass = "bg-slate-50 border-slate-300 !text-slate-900 placeholder
         </div>
       )}
 
-      <div className="mb-10 space-y-3 relative z-10">
-        <p className="text-sm font-semibold uppercase tracking-[0.2em] text-[#D76A36]">Candidate Registration</p>
-        <h2 className="text-3xl font-bold text-slate-900 sm:text-4xl">Register to join our talent pipeline.</h2>
-        <p className="max-w-3xl text-slate-600 text-lg">
-          Complete this form to share your profile, qualifications and career preferences. We match candidates to learnerships, graduate programmes, internships and entry-level roles across South Africa.
-        </p>
-      </div>
-
-      {!submitted ? (
+      {submitted ? (
+        <div className="rounded-[2rem] border border-[#f97316]/20 bg-[#f97316]/5 p-10 text-center">
+          <h2 className="text-3xl font-bold text-slate-900 mb-4">Application Submitted</h2>
+          <p className="text-slate-600">Thank you! Your details have been sent and will be reviewed by our team.</p>
+        </div>
+      ) : (
         <Form onSubmit={handleSubmit(onSubmit)}>
-          <div className="grid gap-8 lg:grid-cols-2 relative z-10">
-            <FormField>
-              <FormLabel htmlFor="fullName" className="text-slate-700 font-semibold">Full Name</FormLabel>
-              <FormControl>
-                <Input id="fullName" placeholder="Jane Doe" className={inputBaseClass} {...register('fullName', { required: true })} />
-              </FormControl>
-              {errors.fullName && <FormMessage className="text-red-500">Full name is required.</FormMessage>}
-            </FormField>
-
-            <FormField>
-              <FormLabel htmlFor="idNumber" className="text-slate-700 font-semibold">ID Number</FormLabel>
-              <FormControl>
-                <Input id="idNumber" placeholder="8001015000084" className={inputBaseClass} {...register('idNumber', { required: true })} />
-              </FormControl>
-              {errors.idNumber && <FormMessage className="text-red-500">ID number is required.</FormMessage>}
-            </FormField>
-
-            <FormField>
-              <FormLabel htmlFor="dateOfBirth" className="text-slate-700 font-semibold">Date of Birth</FormLabel>
-              <FormControl>
-                <Input id="dateOfBirth" type="date" className={inputBaseClass} {...register('dateOfBirth', { required: true })} />
-              </FormControl>
-              {errors.dateOfBirth && <FormMessage className="text-red-500">Date of birth is required.</FormMessage>}
-            </FormField>
-
-            <FormField>
-              <FormLabel htmlFor="phoneNumber" className="text-slate-700 font-semibold">Phone Number</FormLabel>
-              <FormControl>
-                <Input id="phoneNumber" type="tel" placeholder="+27 82 123 4567" className={inputBaseClass} {...register('phoneNumber', { required: true })} />
-              </FormControl>
-              {errors.phoneNumber && <FormMessage className="text-red-500">Phone number is required.</FormMessage>}
-            </FormField>
-
-            <FormField>
-              <FormLabel htmlFor="emailAddress" className="text-slate-700 font-semibold">Email Address</FormLabel>
-              <FormControl>
-                <Input id="emailAddress" type="email" placeholder="jane.doe@example.com" className={inputBaseClass} {...register('emailAddress', { required: true })} />
-              </FormControl>
-              {errors.emailAddress && <FormMessage className="text-red-500">Email address is required.</FormMessage>}
-            </FormField>
-
-            <FormField>
-              <FormLabel htmlFor="province" className="text-slate-700 font-semibold">Province</FormLabel>
-              <FormControl>
-                <Input id="province" placeholder="Gauteng" className={inputBaseClass} {...register('province', { required: true })} />
-              </FormControl>
-              {errors.province && <FormMessage className="text-red-500">Province is required.</FormMessage>}
-            </FormField>
-
-            <FormField>
-              <FormLabel htmlFor="institution" className="text-slate-700 font-semibold">Institution</FormLabel>
-              <FormControl>
-                <Input id="institution" placeholder="University of Pretoria" className={inputBaseClass} {...register('institution', { required: true })} />
-              </FormControl>
-              {errors.institution && <FormMessage className="text-red-500">Institution is required.</FormMessage>}
-            </FormField>
-
-            <FormField>
-              <FormLabel htmlFor="yearCompleted" className="text-slate-700 font-semibold">Year Completed / Current Year</FormLabel>
-              <FormControl>
-                <Input id="yearCompleted" placeholder="2024 / 2nd Year" className={inputBaseClass} {...register('yearCompleted', { required: true })} />
-              </FormControl>
-              {errors.yearCompleted && <FormMessage className="text-red-500">Year completed or current year is required.</FormMessage>}
-            </FormField>
-
-            <FormField>
-              <FormLabel htmlFor="gender" className="text-slate-700 font-semibold">Gender</FormLabel>
-              <FormControl>
-                <Select id="gender" defaultValue="" className={inputBaseClass} {...register('gender', { required: true })}>
-                  <option value="" disabled>Select gender</option>
-                  <option value="Female">Female</option>
-                  <option value="Male">Male</option>
-                  <option value="Non-binary">Non-binary</option>
-                  <option value="Prefer not to say">Prefer not to say</option>
-                </Select>
-              </FormControl>
-              {errors.gender && <FormMessage className="text-red-500">Gender selection is required.</FormMessage>}
-            </FormField>
-
-            <FormField>
-              <FormLabel htmlFor="race" className="text-slate-700 font-semibold">Race (optional)</FormLabel>
-              <FormControl>
-                <Select id="race" defaultValue="" className={inputBaseClass} {...register('race')}>
-                  <option value="">Prefer not to answer</option>
-                  <option value="African">African</option>
-                  <option value="Coloured">Coloured</option>
-                  <option value="Indian">Indian</option>
-                  <option value="White">White</option>
-                </Select>
-              </FormControl>
-            </FormField>
-
-            <FormField>
-              <FormLabel htmlFor="highestQualification" className="text-slate-700 font-semibold">Highest Qualification</FormLabel>
-              <FormControl>
-                <Select id="highestQualification" defaultValue="" className={inputBaseClass} {...register('highestQualification', { required: true })}>
-                  <option value="" disabled>Select qualification</option>
-                  <option value="Grade 11 or lower">Grade 11 or lower</option>
-                  <option value="Matric (National Senior Certificate)">Matric (National Senior Certificate)</option>
-                  <option value="N3 / N4 / N5 / N6 Certificate">N3 / N4 / N5 / N6 Certificate</option>
-                  <option value="Higher Certificate (NQF 5)">Higher Certificate (NQF 5)</option>
-                  <option value="National Diploma (NQF 6)">National Diploma (NQF 6)</option>
-                  <option value="Bachelor's Degree (NQF 7)">Bachelor's Degree (NQF 7)</option>
-                  <option value="Honours Degree / Postgrad (NQF 8+)">Honours Degree / Postgrad (NQF 8+)</option>
-                </Select>
-              </FormControl>
-              {errors.highestQualification && <FormMessage className="text-red-500">This field is required.</FormMessage>}
-            </FormField>
-
-            <FormField>
-              <FormLabel htmlFor="fieldOfStudy" className="text-slate-700 font-semibold">Field of Study</FormLabel>
-              <FormControl>
-                <Select id="fieldOfStudy" defaultValue="" className={inputBaseClass} {...register('fieldOfStudy', { required: true })}>
-                  <option value="" disabled>Select field of study</option>
-                  <option value="Information Technology / Computer Science">Information Technology / Computer Science</option>
-                  <option value="Business Administration / Management">Business Administration / Management</option>
-                  <option value="Accounting / Finance">Accounting / Finance</option>
-                  <option value="Engineering / Artisan Trades">Engineering / Artisan Trades</option>
-                  <option value="Human Resources / Industrial Psychology">Human Resources / Industrial Psychology</option>
-                  <option value="Marketing / Communications">Marketing / Communications</option>
-                  <option value="Retail / Sales">Retail / Sales</option>
-                  <option value="Logistics / Supply Chain">Logistics / Supply Chain</option>
-                  <option value="Other">Other</option>
-                </Select>
-              </FormControl>
-              {errors.fieldOfStudy && <FormMessage className="text-red-500">This field is required.</FormMessage>}
-            </FormField>
-
-            <FormField>
-              <FormLabel htmlFor="employmentStatus" className="text-slate-700 font-semibold">Employment Status</FormLabel>
-              <FormControl>
-                <Select id="employmentStatus" defaultValue="" className={inputBaseClass} {...register('employmentStatus', { required: true })}>
-                  <option value="" disabled>Select employment status</option>
-                  <option value="Unemployed (Never worked)">Unemployed (Never worked)</option>
-                  <option value="Unemployed (Previously worked)">Unemployed (Previously worked)</option>
-                  <option value="Currently Employed (Full-time)">Currently Employed (Full-time)</option>
-                  <option value="Currently Employed (Part-time / Contract)">Currently Employed (Part-time / Contract)</option>
-                  <option value="Self-Employed">Self-Employed</option>
-                  <option value="Student / Learner">Student / Learner</option>
-                </Select>
-              </FormControl>
-              {errors.employmentStatus && <FormMessage className="text-red-500">This field is required.</FormMessage>}
-            </FormField>
-
-            <FormField>
-              <FormLabel htmlFor="programmeType" className="text-slate-700 font-semibold">Interested Programme Type</FormLabel>
-              <FormControl>
-                <Select id="programmeType" defaultValue="" className={inputBaseClass} {...register('programmeType', { required: true })}>
-                  <option value="" disabled>Select programme type</option>
-                  <option value="Learnership">Learnership</option>
-                  <option value="Graduate Programme">Graduate Programme</option>
-                  <option value="Internship">Internship</option>
-                  <option value="Permanent Role">Permanent Role</option>
-                </Select>
-              </FormControl>
-              {errors.programmeType && <FormMessage className="text-red-500">This field is required.</FormMessage>}
-            </FormField>
-
-            <FormField>
-              <FormLabel htmlFor="preferredIndustry" className="text-slate-700 font-semibold">Preferred Industry</FormLabel>
-              <FormControl>
-                <Select id="preferredIndustry" defaultValue="" className={inputBaseClass} {...register('preferredIndustry', { required: true })}>
-                  <option value="" disabled>Select preferred industry</option>
-                  <option value="Financial Services / Banking">Financial Services / Banking</option>
-                  <option value="Information Technology / Tech">Information Technology / Tech</option>
-                  <option value="Retail / FMCG">Retail / FMCG</option>
-                  <option value="Mining / Engineering">Mining / Engineering</option>
-                  <option value="Manufacturing">Manufacturing</option>
-                  <option value="Telecommunications">Telecommunications</option>
-                  <option value="Business Consulting / HR">Business Consulting / HR</option>
-                  <option value="Public Sector / NGO">Public Sector / NGO</option>
-                </Select>
-              </FormControl>
-              {errors.preferredIndustry && <FormMessage className="text-red-500">This field is required.</FormMessage>}
-            </FormField>
-
-            <FormField className="lg:col-span-2">
-              <FormLabel htmlFor="disability" className="text-slate-700 font-semibold">Do you have a disability? (Optional)</FormLabel>
-              <FormControl>
-                <Input id="disability" placeholder="If yes, please specify" className={inputBaseClass} {...register('disability')} />
-              </FormControl>
-            </FormField>
-
-            <FormField className="lg:col-span-2">
-              <FormLabel htmlFor="cv" className="text-slate-700 font-semibold">Upload CV</FormLabel>
-              <FormControl>
-                <Input id="cv" type="file" accept=".pdf,.doc,.docx" className={`pt-2.5 file:mr-4 file:py-1 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-[#3E4CA0]/10 file:text-[#3E4CA0] hover:file:bg-[#3E4CA0]/20 ${inputBaseClass}`} {...register('cv', { required: true })} />
-              </FormControl>
-              {errors.cv && <FormMessage className="text-red-500">CV upload is required.</FormMessage>}
-            </FormField>
-
-            <FormField className="lg:col-span-2">
-              <FormLabel htmlFor="certificates" className="text-slate-700 font-semibold">Upload Certificates</FormLabel>
-              <FormControl>
-                <Input id="certificates" type="file" multiple accept=".pdf,.doc,.docx,.zip" className={`pt-2.5 file:mr-4 file:py-1 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-[#3E4CA0]/10 file:text-[#3E4CA0] hover:file:bg-[#3E4CA0]/20 ${inputBaseClass}`} {...register('certificates')} />
-              </FormControl>
-              <p className="text-xs text-slate-500 mt-1">Upload multiple files or a single .zip folder.</p>
-            </FormField>
-          </div>
-
-          <FormItem className="mt-8 border-t border-slate-100 pt-8">
-            <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-              <Label className="flex items-start gap-3 cursor-pointer">
-                <Checkbox className="h-5 w-5 shrink-0 border-slate-300 text-[#D76A36] focus:ring-[#D76A36] mt-1" {...register('popiaConsent', { required: true })} />
-                <span className="text-sm text-slate-600 leading-relaxed max-w-2xl">
-                  I consent to XMF Human Capital Partners processing my information in line with POPIA.
-                </span>
-              </Label>
-              {errors.popiaConsent && <FormMessage className="text-red-500 whitespace-nowrap">Consent is required.</FormMessage>}
+          {showConsent && (
+            <div className="fixed inset-0 z-50 flex items-center justify-center">
+              <div className="absolute inset-0 bg-black/50" />
+              <div className="relative z-60 w-full max-w-lg rounded-2xl bg-white p-8">
+                <h3 className="text-xl font-semibold text-slate-900">Providing demographic information is voluntary</h3>
+                <p className="mt-4 text-slate-700">Providing demographic information is voluntary, but helps us match you with specialized B-BBEE and Employment Equity opportunities. Do you want to proceed without providing this?</p>
+                <div className="mt-6 flex justify-end gap-3">
+                  <button type="button" onClick={() => setShowConsent(false)} className="rounded-2xl px-4 py-2 bg-slate-100">Go Back</button>
+                  <button type="button" onClick={confirmProceed} className="rounded-2xl px-4 py-2 bg-[#f97316] text-white">Proceed Anyway</button>
+                </div>
+              </div>
             </div>
-          </FormItem>
+          )}
+          <div className="space-y-10">
+            <div className="grid gap-8 lg:grid-cols-2">
+              <FormField>
+                <FormLabel htmlFor="firstName" className="text-slate-700 font-semibold">First Name</FormLabel>
+                <FormControl>
+                  <Input id="firstName" placeholder="Jane" className={inputBaseClass} {...register('firstName', { required: true })} />
+                </FormControl>
+                {errors.firstName && <FormMessage className="text-red-500">First name is required.</FormMessage>}
+              </FormField>
 
-          <div className="flex flex-col gap-6 sm:flex-row sm:items-center sm:justify-between mt-8 bg-slate-50 p-6 rounded-xl border border-slate-100">
-            <div className="space-y-1">
-              <p className="text-xs font-bold uppercase tracking-[0.2em] text-[#D76A36]">Next step</p>
-              <p className="text-sm text-slate-600">
-                Once submitted, our team will review your profile and connect you with matching opportunities.
-              </p>
+              <FormField>
+                <FormLabel htmlFor="surname" className="text-slate-700 font-semibold">Surname</FormLabel>
+                <FormControl>
+                  <Input id="surname" placeholder="Doe" className={inputBaseClass} {...register('surname', { required: true })} />
+                </FormControl>
+                {errors.surname && <FormMessage className="text-red-500">Surname is required.</FormMessage>}
+              </FormField>
+
+              <FormField>
+                <FormLabel htmlFor="idNumber" className="text-slate-700 font-semibold">ID Number</FormLabel>
+                <FormControl>
+                  <Input id="idNumber" placeholder="8001015000084" className={inputBaseClass} {...register('idNumber', { required: 'ID number is required', validate: idNumberValidation })} />
+                </FormControl>
+                {errors.idNumber && <FormMessage className="text-red-500">{String(errors.idNumber.message)}</FormMessage>}
+              </FormField>
+
+              <FormField>
+                <FormLabel htmlFor="dateOfBirth" className="text-slate-700 font-semibold">Date of Birth</FormLabel>
+                <FormControl>
+                  <Input id="dateOfBirth" type="date" className={inputBaseClass} {...register('dateOfBirth', { required: true })} />
+                </FormControl>
+                {errors.dateOfBirth && <FormMessage className="text-red-500">Date of birth is required.</FormMessage>}
+              </FormField>
+
+              <FormField>
+                <FormLabel htmlFor="emailAddress" className="text-slate-700 font-semibold">Email Address</FormLabel>
+                <FormControl>
+                  <Input id="emailAddress" type="email" placeholder="jane.doe@example.com" className={inputBaseClass} {...register('emailAddress', { required: true })} />
+                </FormControl>
+                {errors.emailAddress && <FormMessage className="text-red-500">Email address is required.</FormMessage>}
+              </FormField>
+
+              <FormField>
+                <FormLabel htmlFor="phoneNumber" className="text-slate-700 font-semibold">Phone Number</FormLabel>
+                <FormControl>
+                  <Input id="phoneNumber" type="tel" placeholder="+27 82 123 4567" className={inputBaseClass} {...register('phoneNumber', { required: true })} />
+                </FormControl>
+                {errors.phoneNumber && <FormMessage className="text-red-500">Phone number is required.</FormMessage>}
+              </FormField>
+
+              <FormField>
+                <FormLabel htmlFor="province" className="text-slate-700 font-semibold">Which province are you currently based in?</FormLabel>
+                <FormControl>
+                  <Select id="province" defaultValue="" className={inputBaseClass} {...register('province', { required: true })}>
+                    <option value="" disabled>Select province</option>
+                    <option value="Eastern Cape">Eastern Cape</option>
+                    <option value="Free State">Free State</option>
+                    <option value="Gauteng">Gauteng</option>
+                    <option value="KwaZulu-Natal">KwaZulu-Natal</option>
+                    <option value="Limpopo">Limpopo</option>
+                    <option value="Mpumalanga">Mpumalanga</option>
+                    <option value="Northern Cape">Northern Cape</option>
+                    <option value="North West">North West</option>
+                    <option value="Western Cape">Western Cape</option>
+                  </Select>
+                </FormControl>
+                {errors.province && <FormMessage className="text-red-500">Province is required.</FormMessage>}
+              </FormField>
+
+              <FormField>
+                <FormLabel htmlFor="gender" className="text-slate-700 font-semibold">Gender</FormLabel>
+                <FormControl>
+                  <Select id="gender" defaultValue="" className={inputBaseClass} {...register('gender', { required: true })}>
+                    <option value="" disabled>Select gender</option>
+                    <option value="Female">Female</option>
+                    <option value="Male">Male</option>
+                    <option value="Non-binary">Non-binary</option>
+                    <option value="Prefer not to say">Prefer not to say</option>
+                  </Select>
+                </FormControl>
+                {errors.gender && <FormMessage className="text-red-500">Gender is required.</FormMessage>}
+              </FormField>
+
+              <FormField>
+                <FormLabel htmlFor="highestQualification" className="text-slate-700 font-semibold">What is your highest completed qualification?</FormLabel>
+                <FormControl>
+                  <Input id="highestQualification" placeholder="e.g. NQF 7 - Bachelor's Degree" className={inputBaseClass} {...register('highestQualification', { required: true })} />
+                </FormControl>
+                {errors.highestQualification && <FormMessage className="text-red-500">Highest qualification is required.</FormMessage>}
+              </FormField>
+
+              <FormField>
+                <FormLabel htmlFor="yearCompleted" className="text-slate-700 font-semibold">Year completed</FormLabel>
+                <FormControl>
+                  <Input id="yearCompleted" placeholder="e.g. 2024" className={inputBaseClass} {...register('yearCompleted', { required: true })} />
+                </FormControl>
+                {errors.yearCompleted && <FormMessage className="text-red-500">Year completed is required.</FormMessage>}
+              </FormField>
+
+              <FormField>
+                <FormLabel htmlFor="fieldOfStudy" className="text-slate-700 font-semibold">Field of Study</FormLabel>
+                <FormControl>
+                  <Input id="fieldOfStudy" placeholder="e.g. Business Management" className={inputBaseClass} {...register('fieldOfStudy', { required: true })} />
+                </FormControl>
+                {errors.fieldOfStudy && <FormMessage className="text-red-500">Field of study is required.</FormMessage>}
+              </FormField>
+
+              <FormField>
+                <FormLabel htmlFor="preferredIndustry" className="text-slate-700 font-semibold">Preferred Industry</FormLabel>
+                <FormControl>
+                  <Input id="preferredIndustry" placeholder="e.g. Financial Services" className={inputBaseClass} {...register('preferredIndustry')} />
+                </FormControl>
+              </FormField>
+
+              <FormField>
+                <FormLabel htmlFor="availableStartDate" className="text-slate-700 font-semibold">When are you available to start?</FormLabel>
+                <FormControl>
+                  <Input id="availableStartDate" type="date" className={inputBaseClass} {...register('availableStartDate')} />
+                </FormControl>
+              </FormField>
+
+              <FormField>
+                <FormLabel htmlFor="specialisedField" className="text-slate-700 font-semibold">What field did you specialise in?</FormLabel>
+                <FormControl>
+                  <Input id="specialisedField" placeholder="e.g. Human Resources" className={inputBaseClass} {...register('specialisedField', { required: true })} />
+                </FormControl>
+                {errors.specialisedField && <FormMessage className="text-red-500">Specialised field is required.</FormMessage>}
+              </FormField>
+
+              <FormField>
+                <FormLabel className="text-slate-700 font-semibold">Are you currently employed?</FormLabel>
+                <FormControl>
+                  <div className="flex flex-wrap gap-6 mt-2">
+                    <label className="flex items-center gap-2 rounded-full border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-700">
+                      <input type="radio" value="Yes" {...register('currentlyEmployed')} />
+                      Yes
+                    </label>
+                    <label className="flex items-center gap-2 rounded-full border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-700">
+                      <input type="radio" value="No" defaultChecked {...register('currentlyEmployed')} />
+                      No
+                    </label>
+                  </div>
+                </FormControl>
+              </FormField>
+
+              <FormField>
+                <FormLabel className="text-slate-700 font-semibold">Have you previously participated in a learnership?</FormLabel>
+                <FormControl>
+                  <div className="flex flex-wrap gap-6 mt-2">
+                    <label className="flex items-center gap-2 rounded-full border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-700">
+                      <input type="radio" value="Yes" {...register('previousLearnership')} />
+                      Yes
+                    </label>
+                    <label className="flex items-center gap-2 rounded-full border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-700">
+                      <input type="radio" value="No" defaultChecked {...register('previousLearnership')} />
+                      No
+                    </label>
+                  </div>
+                  {previousLearnership === 'Yes' && (
+                    <div className="mt-4">
+                      <Input id="previousLearnershipDetails" placeholder="Please share the learnership details" className={inputBaseClass} {...register('previousLearnershipDetails')} />
+                    </div>
+                  )}
+                </FormControl>
+              </FormField>
+
+              <FormField>
+                <FormLabel className="text-slate-700 font-semibold">Do you have reliable access to transport?</FormLabel>
+                <FormControl>
+                  <div className="flex flex-wrap gap-6 mt-2">
+                    <label className="flex items-center gap-2 rounded-full border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-700">
+                      <input type="radio" value="Yes" {...register('transportAccess')} />
+                      Yes
+                    </label>
+                    <label className="flex items-center gap-2 rounded-full border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-700">
+                      <input type="radio" value="No" defaultChecked {...register('transportAccess')} />
+                      No
+                    </label>
+                  </div>
+                </FormControl>
+              </FormField>
+
+              <FormField>
+                <FormLabel className="text-slate-700 font-semibold">Are you willing to relocate?</FormLabel>
+                <FormControl>
+                  <div className="flex flex-wrap gap-6 mt-2">
+                    <label className="flex items-center gap-2 rounded-full border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-700">
+                      <input type="radio" value="Yes" {...register('willingToRelocate')} />
+                      Yes
+                    </label>
+                    <label className="flex items-center gap-2 rounded-full border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-700">
+                      <input type="radio" value="No" defaultChecked {...register('willingToRelocate')} />
+                      No
+                    </label>
+                  </div>
+                </FormControl>
+              </FormField>
+
+              <FormField className="lg:col-span-2">
+                <FormLabel htmlFor="institution" className="text-slate-700 font-semibold">Current Institution / Employer</FormLabel>
+                <FormControl>
+                  <Input id="institution" placeholder="University, college or company" className={inputBaseClass} {...register('institution')} />
+                </FormControl>
+              </FormField>
+
+              <FormField className="lg:col-span-2">
+                <FormLabel htmlFor="programmeType" className="text-slate-700 font-semibold">Preferred Programme / Industry</FormLabel>
+                <FormControl>
+                  <Input id="programmeType" placeholder="e.g. Learnership, Graduate Programme" className={inputBaseClass} {...register('programmeType')} />
+                </FormControl>
+              </FormField>
             </div>
-            <Button type="submit" disabled={isSubmitting} className="bg-[#D76A36] hover:bg-[#b85a2d] text-white px-8 py-6 h-auto text-base font-semibold shadow-lg transition-all whitespace-nowrap">
-              {isSubmitting ? "Submitting securely..." : "Submit candidate profile"}
-            </Button>
+
+            <div className="rounded-3xl border border-slate-200 bg-slate-100 p-6">
+              <p className="text-slate-900 font-semibold">Files too large or need splitting? Use <a href="https://www.ilovepdf.com/split_pdf" target="_blank" rel="noreferrer" className="text-slate-900 underline">iLovePDF</a> before uploading.</p>
+            </div>
+
+            {/* Employment Equity & Compliance Section */}
+            <div className="rounded-3xl border border-slate-200 bg-slate-200 p-6">
+              <h3 className="text-lg font-semibold text-slate-900 mb-4">Employment Equity & Compliance</h3>
+              <p className="text-sm text-slate-700 mb-6">Your race and disability information is voluntary and helps us place you in equity-aligned roles.</p>
+              <div className="grid gap-4 lg:grid-cols-2">
+                <div>
+                  <FormLabel className="text-slate-900 font-semibold">Race</FormLabel>
+                  <FormControl>
+                    <Select {...register('race')} className={inputBaseClass}>
+                      <option value="">Prefer not to answer</option>
+                      <option value="African">African</option>
+                      <option value="Coloured">Coloured</option>
+                      <option value="Indian">Indian</option>
+                      <option value="White">White</option>
+                      <option value="Other">Other</option>
+                    </Select>
+                  </FormControl>
+                </div>
+
+                <div>
+                  <FormLabel className="text-slate-900 font-semibold">Disability</FormLabel>
+                  <FormControl>
+                    <div className="flex gap-6 items-center mt-2">
+                      <label className="flex items-center gap-2 text-slate-900">
+                        <input type="radio" value="Yes" {...register('disability')} />
+                        <span className="text-sm">Yes</span>
+                      </label>
+                      <label className="flex items-center gap-2 text-slate-900">
+                        <input type="radio" value="No" defaultChecked {...register('disability')} />
+                        <span className="text-sm">No</span>
+                      </label>
+                    </div>
+                    {watch('disability') === 'Yes' && (
+                      <div className="mt-3">
+                        <Input id="disabilityDetails" placeholder="Please specify the nature of your disability" className={inputBaseClass} {...register('disabilityDetails', { required: 'Please specify your disability' })} />
+                        {errors.disabilityDetails && <FormMessage className="text-red-500">{String(errors.disabilityDetails.message)}</FormMessage>}
+                      </div>
+                    )}
+                  </FormControl>
+                </div>
+              </div>
+            </div>
+
+            <div className="grid gap-8 lg:grid-cols-3">
+              <FormField>
+                <FormLabel htmlFor="idDocument" className="text-slate-700 font-semibold">ID Document</FormLabel>
+                <FormControl>
+                  <Input id="idDocument" type="file" accept=".pdf,.jpg,.png" className={`${inputBaseClass} file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-[#f97316]/10 file:text-[#f97316] hover:file:bg-[#f97316]/20`} {...register('idDocument', { required: 'ID document is required' })} />
+                </FormControl>
+                {errors.idDocument && <FormMessage className="text-red-500">{String(errors.idDocument.message)}</FormMessage>}
+              </FormField>
+
+              <FormField>
+                <FormLabel htmlFor="cv" className="text-slate-700 font-semibold">CV</FormLabel>
+                <FormControl>
+                  <Input id="cv" type="file" accept=".pdf,.doc,.docx" className={`${inputBaseClass} file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-[#f97316]/10 file:text-[#f97316] hover:file:bg-[#f97316]/20`} {...register('cv', { required: true })} />
+                </FormControl>
+                {errors.cv && <FormMessage className="text-red-500">CV upload is required.</FormMessage>}
+              </FormField>
+
+              <FormField>
+                <FormLabel htmlFor="qualifications" className="text-slate-700 font-semibold">Qualifications</FormLabel>
+                <FormControl>
+                  <Input id="qualifications" type="file" multiple accept=".pdf,.doc,.docx,.zip" className={`${inputBaseClass} file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-[#f97316]/10 file:text-[#f97316] hover:file:bg-[#f97316]/20`} {...register('qualifications', { required: 'Qualifications are required' })} />
+                </FormControl>
+                {errors.qualifications && <FormMessage className="text-red-500">{String(errors.qualifications.message)}</FormMessage>}
+                <p className="text-xs text-slate-500 mt-1">Attach individual qualification files or a combined archive.</p>
+              </FormField>
+            </div>
+
+            <div className="grid gap-8 lg:grid-cols-2">
+              <FormField>
+                <Label className="flex items-center gap-2">
+                  <input type="checkbox" className="h-4 w-4 rounded border-slate-300 text-[#f97316] focus:ring-[#f97316]" {...register('popiaConsent', { required: true })} />
+                  <span className="text-slate-700 text-sm">I agree to the POPIA privacy and information processing policy.</span>
+                </Label>
+                {errors.popiaConsent && <FormMessage className="text-red-500">You must consent before submitting.</FormMessage>}
+              </FormField>
+
+              <div className="flex items-end justify-end">
+                <Button type="submit" disabled={isSubmitting} className="w-full md:w-auto bg-[#f97316] text-white hover:bg-[#ea680a]">
+                  {isSubmitting ? 'Submitting...' : 'Submit Application'}
+                </Button>
+              </div>
+            </div>
           </div>
         </Form>
-      ) : (
-        <div className="mt-6 rounded-2xl border border-emerald-200 bg-emerald-50 p-12 text-center shadow-sm relative z-10">
-          <div className="w-16 h-16 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center mx-auto mb-6">
-            <svg className="w-8 h-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-            </svg>
-          </div>
-          <h3 className="mb-4 text-3xl font-bold text-slate-900">Application Received!</h3>
-          <p className="text-lg text-slate-600 max-w-2xl mx-auto">
-            Thank you! Your information and documents have been securely uploaded to our system. A member of our candidate team will review your profile and be in touch soon.
-          </p>
-        </div>
       )}
     </div>
   );

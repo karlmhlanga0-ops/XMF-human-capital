@@ -65,6 +65,50 @@ export function HomePage() {
         </div>
       </section>
 
+      {/* Conversion CTA */}
+      <section className="py-20 bg-gradient-to-r from-[#f8f0e6] via-[#fff7ed] to-[#fff1d1] border-b border-slate-200">
+        <div className="mx-auto max-w-[1240px] px-6 lg:px-8">
+          <div className="grid gap-10 lg:grid-cols-[1.3fr_0.9fr] items-center">
+            <div className="space-y-6">
+              <p className="text-sm font-semibold uppercase tracking-[0.2em] text-[#D76A36]">Architect Your Talent Pipeline</p>
+              <h2 className="text-4xl font-bold tracking-tight text-slate-950 sm:text-5xl">
+                Get the advisory support that turns interest into conversions.
+              </h2>
+              <p className="max-w-2xl text-lg leading-8 text-slate-700">
+                Book a strategy session with our team to align your employer brand, candidate funnel and compliance-ready placement process. This is the action point that drives real conversations.
+              </p>
+              <div className="flex flex-col gap-4 sm:flex-row sm:items-center">
+                <Link to="/advisory" className="inline-flex w-full sm:w-auto">
+                  <Button className="w-full bg-[#D76A36] hover:bg-[#c25a29] text-white px-8 py-6 rounded-2xl shadow-xl shadow-[#D76A36]/20 transition-all duration-300">
+                    Book Advisory Session
+                  </Button>
+                </Link>
+                <Link to="/employers" className="inline-flex w-full sm:w-auto">
+                  <Button className="w-full bg-slate-950 hover:bg-slate-800 text-white px-8 py-6 rounded-2xl border border-slate-900 transition-all duration-300">
+                    Employer Partnership
+                  </Button>
+                </Link>
+              </div>
+            </div>
+            <div className="rounded-[2rem] border border-[#FDE3CE] bg-white p-10 shadow-xl shadow-[#D76A36]/10">
+              <p className="text-sm uppercase tracking-[0.25em] text-[#D76A36] font-semibold">Conversion Booster</p>
+              <div className="mt-6 space-y-5">
+                {[
+                  'Clear advisory path for employers and candidates.',
+                  'Fast connection to compliant talent pipelines.',
+                  'High-touch follow-up for better submission-to-placement conversion.',
+                ].map((item) => (
+                  <div key={item} className="flex gap-4">
+                    <span className="mt-1 inline-flex h-9 w-9 items-center justify-center rounded-2xl bg-[#F6C7A0] text-[#7A3A0F] font-semibold">✓</span>
+                    <p className="text-base text-slate-700 leading-7">{item}</p>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* Trusted Partners */}
       <section className="py-20 bg-[#1E254C]">
         <div className="mx-auto max-w-[1240px] px-6 lg:px-8">
@@ -167,35 +211,6 @@ export function HomePage() {
         </div>
       </section>
 
-      {/* CTA Section */}
-      <section className="relative overflow-hidden bg-[#3E4CA0] py-24">
-        {/* Subtle background glow */}
-        <div className="absolute top-0 right-0 -mr-32 -mt-32 w-[500px] h-[500px] rounded-full bg-[#D76A36]/20 blur-[100px] pointer-events-none"></div>
-        
-        <div className="relative z-10 mx-auto max-w-[1240px] px-6 lg:px-8 flex flex-col gap-10 lg:flex-row lg:items-center lg:justify-between">
-          <div className="max-w-3xl">
-            <p className="text-sm font-semibold uppercase tracking-[0.2em] text-white/70 mb-4">Ready to get started?</p>
-            <h2 className="text-4xl font-bold leading-tight text-white sm:text-5xl text-balance">
-              Join XMF and unlock premium talent pipelines.
-            </h2>
-            <p className="mt-6 max-w-2xl text-lg text-white/80 leading-relaxed">
-              Whether you are an employer seeking future leaders or a candidate ready for your next opportunity, we're here to connect you with the right opportunities and talent.
-            </p>
-          </div>
-          <div className="flex flex-col sm:flex-row gap-4 whitespace-nowrap lg:shrink-0">
-            <Link to="/candidates">
-              <Button className="w-full sm:w-auto bg-[#D76A36] hover:bg-[#c25a29] text-white font-semibold px-8 py-6 rounded-md shadow-lg transition-all duration-300">
-                Candidate Register
-              </Button>
-            </Link>
-            <Link to="/employers">
-              <Button className="w-full sm:w-auto bg-transparent hover:bg-white/10 text-white border-2 border-white/30 font-semibold px-8 py-6 rounded-md transition-all duration-300">
-                Employer Partner
-              </Button>
-            </Link>
-          </div>
-        </div>
-      </section>
     </div>
   );
 }

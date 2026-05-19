@@ -22,39 +22,41 @@ export function Footer() {
             </p>
           </div>
 
-          {/* Quick Links */}
-          <div>
-            <h3 className="text-sm font-semibold uppercase tracking-[0.15em] text-white mb-4 block">Company</h3>
-            <nav className="flex flex-col gap-4 text-sm">
-              <Link to="/about" className="text-slate-400 hover:text-white transition-colors">
-                About Us
-              </Link>
-              <Link to="/services" className="text-slate-400 hover:text-white transition-colors">
-                Services
-              </Link>
-              <Link to="/contact" className="text-slate-400 hover:text-white transition-colors">
-                Contact
-              </Link>
-            </nav>
-          </div>
-
-          {/* For Everyone */}
-          <div>
-            <h3 className="text-sm font-semibold uppercase tracking-[0.15em] text-white mb-4 block">Access</h3>
-            <nav className="flex flex-col gap-4 text-sm">
-              <Link to="/candidates" className="text-slate-400 hover:text-white transition-colors">
-                For Candidates
-              </Link>
-              <Link to="/employers" className="text-slate-400 hover:text-white transition-colors">
-                For Employers
-              </Link>
-              <a 
-                href="mailto:info@xmfpartners.co.za" 
-                className="text-slate-400 hover:text-white transition-colors"
-              >
-                Email Us
-              </a>
-            </nav>
+          <div className="grid grid-cols-1 gap-8 sm:grid-cols-2 md:col-span-2">
+            <div>
+              <h3 className="text-sm font-semibold uppercase tracking-[0.15em] text-white mb-4 block">Company</h3>
+              <nav className="flex flex-col gap-4 text-sm">
+                <Link to="/about" className="text-slate-400 hover:text-white transition-colors">
+                  About Us
+                </Link>
+                <Link to="/services" className="text-slate-400 hover:text-white transition-colors">
+                  Services
+                </Link>
+                <Link to="/advisory" className="text-slate-400 hover:text-white transition-colors">
+                  Advisory
+                </Link>
+                <Link to="/pitch" className="text-slate-400 hover:text-white transition-colors">
+                  Pitch
+                </Link>
+              </nav>
+            </div>
+            <div>
+              <h3 className="text-sm font-semibold uppercase tracking-[0.15em] text-white mb-4 block">Access</h3>
+              <nav className="flex flex-col gap-4 text-sm">
+                <Link to="/candidates" className="text-slate-400 hover:text-white transition-colors">
+                  For Candidates
+                </Link>
+                <Link to="/employers" className="text-slate-400 hover:text-white transition-colors">
+                  For Employers
+                </Link>
+                <a 
+                  href="mailto:info@xmfpartners.co.za" 
+                  className="text-slate-400 hover:text-white transition-colors"
+                >
+                  Email Us
+                </a>
+              </nav>
+            </div>
           </div>
         </div>
 
@@ -66,7 +68,9 @@ export function Footer() {
               <p className="text-xs text-slate-500">
                 © {new Date().getFullYear()} XMF Human Capital Partners. All rights reserved.
               </p>
-              <span className="text-slate-500 text-sm">Developed by Octothorp Digital Solutions</span>
+              <span className="text-slate-500 text-sm">
+                Developed by <a href="https://octothorp.online" target="_blank" rel="noreferrer" className="text-slate-300 hover:text-white transition-colors">Octothorp Digital Solutions</a>
+              </span>
             </div>
             <div className="flex gap-6 text-xs text-slate-500">
               <Link to="/privacy-policy" className="hover:text-white transition-colors">Privacy Policy</Link>

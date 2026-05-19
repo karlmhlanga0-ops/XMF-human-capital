@@ -8,6 +8,10 @@ import { HomePage } from './pages/HomePage';
 import { PrivacyPolicy } from './pages/PrivacyPolicy';
 import { ServicesPage } from './pages/ServicesPage';
 import { TermsOfService } from './pages/TermsOfService';
+import { AdvisoryPage } from './pages/AdvisoryPage';
+import { AdminPage } from './pages/AdminPage';
+import { AdminLoginPage } from './pages/AdminLoginPage';
+import { PitchPage } from './pages/PitchPage';
 
 function App() {
   return (
@@ -19,6 +23,10 @@ function App() {
           <Route path="services" element={<ServicesPage />} />
           <Route path="employers" element={<EmployersPage />} />
           <Route path="candidates" element={<CandidatesPage />} />
+          <Route path="advisory" element={<AdvisoryPage />} />
+          <Route path="admin" element={<AdminPage />} />
+          <Route path="admin/login" element={<AdminLoginPage />} />
+          <Route path="pitch" element={<PitchPage />} />
           <Route path="contact" element={<ContactPage />} />
           <Route path="privacy-policy" element={<PrivacyPolicy />} />
           <Route path="terms-of-service" element={<TermsOfService />} />

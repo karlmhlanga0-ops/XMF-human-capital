@@ -1,4 +1,5 @@
 import { BookOpen, GraduationCap, Briefcase, Target, Award } from 'lucide-react';
+import { Link } from 'react-router-dom';
 
 const services = [
   { 
@@ -97,6 +98,23 @@ export function ServicesPage() {
               <p className="text-slate-600 leading-relaxed text-sm">{service.description}</p>
             </div>
           ))}
+        </div>
+      </section>
+
+      {/* Advisory CTA */}
+      <section className="py-16 bg-white">
+        <div className="mx-auto max-w-[1240px] px-6 lg:px-8">
+          <div className="rounded-2xl border border-slate-100 bg-white p-8 flex flex-col md:flex-row md:items-center md:justify-between gap-6">
+            <div>
+              <h3 className="text-2xl font-bold text-slate-900">Architect Your Talent Pipeline</h3>
+              <p className="mt-2 text-slate-700 max-w-2xl">Need a custom workforce strategy? Book a 30-minute advisory session with our Managing Director to build a compliant, high-performing talent pipeline from the ground up.</p>
+            </div>
+            <div>
+              <Link to="/advisory" className="">
+                <button className="bg-[#D76A36] hover:bg-[#c25a29] text-white px-6 py-4 rounded-md">Book an Advisory Session</button>
+              </Link>
+            </div>
+          </div>
         </div>
       </section>
     </div>

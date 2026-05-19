@@ -5,13 +5,20 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
+    "start:server": "node server/index.js",
+    "dev:all": "concurrently \"npm run start:server\" \"npm run dev\"",
     "build": "tsc && vite build",
     "preview": "vite preview"
   },
   "dependencies": {
+    "concurrently": "^8.2.2",
+    "dotenv": "^17.4.2",
+    "express": "^4.22.2",
+    "framer-motion": "^10.18.0",
     "jspdf": "^4.2.1",
     "jspdf-autotable": "^5.0.7",
     "lucide-react": "^0.490.0",
+    "openai": "^6.38.0",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "react-hook-form": "^7.47.2",

@@ -65,6 +65,12 @@ export function Navbar() {
               >
                 Generate a Quote
               </NavLink>
+              <NavLink
+                to="/admin/login"
+                className="mt-2 block rounded-2xl px-4 py-3 text-sm font-medium text-slate-400 hover:bg-white/5 hover:text-white transition-colors border border-white/5 bg-slate-800/30"
+              >
+                Admin (Login)
+              </NavLink>
             </div>
           </div>
         </div>
