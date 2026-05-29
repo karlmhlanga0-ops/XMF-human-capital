@@ -5,7 +5,7 @@ export default async function handler(req: any, res: any) {
 
   try {
     const body = req.body || (await req.json?.());
-    const WEBHOOK_URL = 'https://script.google.com/macros/s/AKfycbxp6G21cuRBy6SE5nT1mglnz6rS0Y-MBMKBX9XsvpV7yVe7Hx8uStn6hXD-NvyVaasE/exec';
+    const WEBHOOK_URL = 'https://script.google.com/a/macros/xmfpartners.co.za/s/AKfycbx4qjxe6efkChMJRDIwZazrgjXjJKGGh8FF_0YlIuJvZVpTvmabV9niCeNnzhWm25s8/exec';
 
     const response = await fetch(WEBHOOK_URL, {
       method: 'POST',
