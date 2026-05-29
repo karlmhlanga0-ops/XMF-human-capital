@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { Button } from '../components/ui/button';
 import { Card } from '../components/ui/card';
 import { Textarea } from '../components/ui/textarea';
-import { ArrowRight, ChevronRight, FileText, ShieldCheck, Car, MapPin } from 'lucide-react';
+import { ArrowRight, ChevronRight, FileText, ShieldCheck, Car, MapPin, Download } from 'lucide-react';
 import { Navigate, useNavigate } from 'react-router-dom';
 
 interface CandidateRow {
@@ -45,16 +45,16 @@ function autoScreener(candidate: CandidateRow): ScreeningStatus {
 function mapCsvScreening(raw: string | undefined): ScreeningStatus | undefined {
   if (!raw) return undefined;
   const r = raw.trim().toLowerCase();
-  if (r === 'approved' || r === 'approved ' || r === 'approve') return 'Eligible';
-  if (r === 'pending') return 'Requires Follow-Up';
-  if (r === 'hold' || r === 'on hold') return 'Not Eligible';
+  if (r === 'approved' || r === 'approved ' || r === 'approve' || r === 'eligible') return 'Eligible';
+  if (r === 'pending' || r === 'requires follow-up') return 'Requires Follow-Up';
+  if (r === 'hold' || r === 'on hold' || r === 'not eligible') return 'Not Eligible';
   return undefined;
 }
 
 const statusStyles: Record<ScreeningStatus, string> = {
   'Not Eligible': 'bg-red-100 text-red-800',
   'Requires Follow-Up': 'bg-amber-100 text-amber-800',
-  Eligible: 'bg-emerald-100 text-emerald-800',
+  'Eligible': 'bg-emerald-100 text-emerald-800',
 };
 
 export function AdminPage() {
@@ -69,6 +69,9 @@ export function AdminPage() {
   const [newsletter, setNewsletter] = useState('');
   const [isGenerating, setIsGenerating] = useState(false);
   const [loadError, setLoadError] = useState<string | null>(null);
+  
+  // New state for downloads
+  const [isDownloading, setIsDownloading] = useState(false);
 
   useEffect(() => {
     // Require dummy auth
@@ -87,11 +90,13 @@ export function AdminPage() {
 
         const mapHeader = (h: string) => {
           const key = h.trim();
-          // Map exact published headers to internal keys
           switch (key) {
             case 'Timestamp': return 'timestamp';
-            case 'Name': return 'name';
+            case 'Name': return 'firstName';
+            case 'First Name': return 'firstName';
             case 'Surname': return 'surname';
+            case 'Last Name': return 'surname';
+            case 'Full Name': return 'fullName';
             case 'ID Number': return 'idNumber';
             case 'Gender': return 'gender';
             case 'Email': return 'email';
@@ -108,7 +113,6 @@ export function AdminPage() {
             case 'Screening Status': return 'screeningStatus';
             case 'Google drive link': return 'attachmentLink';
             default:
-              // fallback: slugify header
               return key.toLowerCase().replace(/[^a-z0-9]/g, '');
           }
         };
@@ -118,13 +122,12 @@ export function AdminPage() {
           headers.forEach((h, idx) => {
             const key = mapHeader(h);
             const val = rowArr[idx] ?? '';
-            (item as any)[key] = String(val).trim();
+            const normalized = String(val).trim().replace(/^'+/, '');
+            (item as any)[key] = normalized;
           });
-          // Compose fullName from Name + Surname if present
-          const name = (item as any)['name'] || '';
-          const surname = (item as any)['surname'] || '';
-          (item as any)['fullName'] = `${name} ${surname}`.trim() || ((item as any)['fullName'] || '');
-          // Ensure attachmentLink key exists
+          const firstName = (item as any)['firstName'] || (item as any)['name'] || '';
+          const lastName = (item as any)['surname'] || (item as any)['lastName'] || '';
+          (item as any)['fullName'] = ((item as any)['fullName'] || `${firstName} ${lastName}`).trim();
           (item as any)['attachmentLink'] = (item as any)['attachmentLink'] || '';
           return item;
         });
@@ -283,6 +286,67 @@ export function AdminPage() {
     }
   };
 
+  // --- NEW: BATCH DOWNLOAD LOGIC ---
+  const handleBatchDownload = async () => {
+    setIsDownloading(true);
+    // Collect all folder URLs from currently filtered candidates
+    const urls = filteredRows.map(r => r.attachmentLink).filter(link => link && link.includes('drive.google.com'));
+    
+    if (urls.length === 0) {
+       alert("No valid attachment folders found for current filters.");
+       setIsDownloading(false);
+       return;
+    }
+
+    try {
+      const WEBHOOK_URL = '/api/submit-candidate'; 
+      const response = await fetch(WEBHOOK_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action: 'downloadBatch', folderUrls: urls }),
+      });
+      
+      const data = await response.json();
+      if (data.status === 'success' && data.data?.downloadUrl) {
+         window.open(data.data.downloadUrl, '_blank');
+      } else {
+         alert("Failed to generate zip file.");
+      }
+    } catch (error) {
+      console.error("Batch download error", error);
+      alert("An error occurred while connecting to the server.");
+    } finally {
+      setIsDownloading(false);
+    }
+  };
+
+  // --- NEW: STATUS WRITEBACK LOGIC ---
+  const handleStatusChange = async (candidateId: string, newStatus: ScreeningStatus) => {
+    setStatusOverrides((s) => ({ ...s, [candidateId]: newStatus }));
+    
+    const triggerEmail = window.confirm(`Update status to ${newStatus}? Do you want to send an automated email update to the candidate?`);
+
+    try {
+      const WEBHOOK_URL = '/api/submit-candidate'; 
+      const response = await fetch(WEBHOOK_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          action: 'updateStatus',
+          idNumber: candidateId,
+          newStatus: newStatus,
+          triggerEmail: triggerEmail
+        }),
+      });
+      
+      if (!response.ok) {
+         console.error("Failed to write back to sheet");
+      }
+    } catch (error) {
+      console.error("Writeback error", error);
+    }
+  };
+
   return (
     <div className="min-h-screen bg-slate-950 text-slate-100">
       <div className="mx-auto max-w-[1240px] px-6 py-16 lg:px-8">
@@ -393,6 +457,16 @@ export function AdminPage() {
                         <option key={p} value={p}>{p}</option>
                       ))}
                     </select>
+                    {/* BATCH DOWNLOAD BUTTON INJECTED HERE */}
+                    <button
+                      type="button"
+                      onClick={handleBatchDownload}
+                      disabled={isDownloading}
+                      className="inline-flex items-center gap-2 rounded-2xl bg-[#f97316] px-4 py-2 text-sm font-semibold text-white transition hover:bg-[#ea680a] disabled:opacity-50"
+                    >
+                      <Download className="h-4 w-4" />
+                      {isDownloading ? 'Zipping...' : 'Download'}
+                    </button>
                   </div>
                 </div>
               </div>
@@ -460,20 +534,17 @@ export function AdminPage() {
                             <td className="px-5 py-4">{row.gender || '—'}</td>
                             <td className="px-5 py-4">{row.race || '—'}</td>
                             <td className="px-5 py-4">{row.disability || '—'}</td>
-                            <td className="px-5 py-4 flex items-center gap-3">
-                              <span className={`inline-flex rounded-full px-3 py-1 text-xs font-semibold ${statusStyles[status]}`}>
+                            <td className="px-5 py-4 flex flex-col gap-3 sm:flex-row sm:items-center">
+                              <span className={`inline-flex whitespace-nowrap rounded-full px-3 py-1 text-xs font-semibold ${statusStyles[status]}`}>
                                 {status}
                               </span>
+                              {/* STATUS OVERRIDE INJECTED HERE */}
                               <select
-                                value={overridden ?? ''}
-                                onChange={(e) => {
-                                  const val = e.target.value as ScreeningStatus | '';
-                                  setStatusOverrides((s) => ({ ...s, [key]: val }));
-                                }}
-                                className="rounded-md bg-slate-900/70 text-xs text-slate-200 px-2 py-1"
+                                value={overridden !== '' ? overridden : status}
+                                onChange={(e) => handleStatusChange(row.idNumber, e.target.value as ScreeningStatus)}
+                                className="rounded-md bg-slate-900/70 text-xs text-slate-200 px-2 py-1 border border-white/10"
                                 aria-label="Status override"
                               >
-                                <option value="">Auto</option>
                                 <option value="Eligible">Eligible</option>
                                 <option value="Requires Follow-Up">Requires Follow-Up</option>
                                 <option value="Not Eligible">Not Eligible</option>
@@ -566,7 +637,6 @@ export function AdminPage() {
               </div>
             </Card>
           </div>
-
         </section>
       </div>
     </div>

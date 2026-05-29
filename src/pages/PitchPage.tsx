@@ -93,12 +93,10 @@ const slides = [
   },
   {
     id: 'vision',
-    title: 'Growth Roadmap',
-    subtitle: 'From pilot to national talent pipeline across sectors.',
+    title: 'Investment Structure',
+    subtitle: 'Transparent pricing tiers for our core services.',
     bullets: [
-      'Scale with employer cohorts and training partners.',
-      'Add deeper assessment, placement and retention workflows.',
-      'Build a trusted channel for transformation-driven talent supply.',
+      'Pricing tiers and custom packages for enterprise and volume engagements.',
     ],
     image: 'https://images.unsplash.com/photo-1497366754035-f200968a6e72?auto=format&fit=crop&w=1200&q=80',
   },
@@ -187,13 +185,41 @@ export function PitchPage() {
                     <h2 className="text-4xl font-bold tracking-tight text-white sm:text-5xl">{slides[currentSlide].title}</h2>
                     <p className="max-w-3xl text-lg leading-8 text-slate-300">{slides[currentSlide].subtitle}</p>
                   </div>
-                  <div className="grid gap-4 sm:grid-cols-2">
-                    {slides[currentSlide].bullets.map((b) => (
-                      <div key={b} className="rounded-[2rem] border border-white/10 bg-slate-950/80 p-6 shadow-xl shadow-black/20">
-                        <p className="text-sm font-semibold uppercase tracking-[0.2em] text-slate-400">Key point</p>
-                        <p className="mt-3 text-base text-slate-200">{b}</p>
+                  <div>
+                    {slides[currentSlide].id === 'vision' ? (
+                      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-2">
+                        <div className="rounded-2xl border border-white/10 bg-slate-900/80 p-6 shadow-md">
+                          <h4 className="text-lg font-semibold text-white">Learnership Candidate Placement (Screened & Registered)</h4>
+                          <p className="mt-2 text-slate-300">R6,000 per candidate</p>
+                        </div>
+                        <div className="rounded-2xl border border-white/10 bg-slate-900/80 p-6 shadow-md">
+                          <h4 className="text-lg font-semibold text-white">Candidate Identification Support (Pre-Screened CV Delivery)</h4>
+                          <p className="mt-2 text-slate-300">R2,500 - R3,500 per candidate</p>
+                        </div>
+                        <div className="rounded-2xl border border-white/10 bg-slate-900/80 p-6 shadow-md">
+                          <h4 className="text-lg font-semibold text-white">Managed Talent Pipeline Recruitment (Premium)</h4>
+                          <p className="mt-2 text-slate-300">R7,500 - R12,000 per candidate</p>
+                        </div>
+                        <div className="rounded-2xl border border-white/10 bg-slate-900/80 p-6 shadow-md">
+                          <h4 className="text-lg font-semibold text-white">Graduate Recruitment Campaign Support</h4>
+                          <p className="mt-2 text-slate-300">R12,000 - R25,000 per candidate</p>
+                        </div>
+                        <div className="rounded-2xl border border-white/10 bg-slate-900/80 p-6 shadow-md lg:col-span-2">
+                          <h4 className="text-lg font-semibold text-white">Transformation-Aligned Talent Pipeline Advisory</h4>
+                          <p className="mt-2 text-slate-300">R25,000 - R120,000 per engagement</p>
+                        </div>
+                        <div className="lg:col-span-2 text-sm text-slate-400 mt-2">Custom packages available based on volume and specific compliance requirements.</div>
                       </div>
-                    ))}
+                    ) : (
+                      <div className="grid gap-4 sm:grid-cols-2">
+                        {slides[currentSlide].bullets.map((b) => (
+                          <div key={b} className="rounded-[2rem] border border-white/10 bg-slate-950/80 p-6 shadow-xl shadow-black/20">
+                            <p className="text-sm font-semibold uppercase tracking-[0.2em] text-slate-400">Key point</p>
+                            <p className="mt-3 text-base text-slate-200">{b}</p>
+                          </div>
+                        ))}
+                      </div>
+                    )}
                   </div>
                 </div>
 

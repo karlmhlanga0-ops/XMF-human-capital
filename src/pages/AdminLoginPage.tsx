@@ -12,7 +12,7 @@ export function AdminLoginPage() {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     // Dummy credentials: admin / password
-    if (user === 'admin' && pass === 'password') {
+    if (user === 'admin' && pass === 'partnerspassworD123#') {
       localStorage.setItem('isAdmin', 'true');
       navigate('/admin');
     } else {
