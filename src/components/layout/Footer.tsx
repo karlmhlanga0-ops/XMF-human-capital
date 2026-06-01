@@ -50,6 +50,20 @@ export function Footer() {
                   For Employers
                 </Link>
                 <a 
+                  href="tel:+27101573774" 
+                  className="text-slate-400 hover:text-white transition-colors"
+                >
+                  Call Us: 010 157 3774
+                </a>
+                <a 
+                  href="https://wa.me/27609915131" 
+                  target="_blank" 
+                  rel="noreferrer" 
+                  className="text-slate-400 hover:text-white transition-colors"
+                >
+                  WhatsApp: 060 991 5131
+                </a>
+                <a 
                   href="mailto:info@xmfpartners.co.za" 
                   className="text-slate-400 hover:text-white transition-colors"
                 >

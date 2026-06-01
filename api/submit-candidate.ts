@@ -1,11 +1,9 @@
-import fetch from 'node-fetch';
-
 export default async function handler(req: any, res: any) {
   if (req.method !== 'POST') return res.status(405).json({ status: 'error', message: 'Method not allowed' });
 
   try {
     const body = req.body || (await req.json?.());
-    const WEBHOOK_URL = 'https://script.google.com/a/macros/xmfpartners.co.za/s/AKfycbx4qjxe6efkChMJRDIwZazrgjXjJKGGh8FF_0YlIuJvZVpTvmabV9niCeNnzhWm25s8/exec';
+    const WEBHOOK_URL = 'https://script.google.com/macros/s/AKfycbx4qjxe6efkChMJRDIwZazrgjXjJKGGh8FF_0YlIuJvZVpTvmabV9niCeNnzhWm25s8/exec';
 
     const response = await fetch(WEBHOOK_URL, {
       method: 'POST',

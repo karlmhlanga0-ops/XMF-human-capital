@@ -45,10 +45,15 @@ export function ContactPage() {
               <Phone className="w-7 h-7" />
             </div>
             <p className="text-xs font-bold uppercase tracking-[0.2em] text-[#3E4CA0] mb-2">Phone</p>
-            <a href="tel:0609915131" className="text-lg font-bold text-slate-900 hover:text-[#D76A36] transition-colors">
-              060 991 5131
-            </a>
-            <p className="text-slate-600 text-sm mt-1">Mon-Fri, 8am-5pm</p>
+            <div className="space-y-2">
+              <a href="tel:+27101573774" className="block text-lg font-bold text-slate-900 hover:text-[#D76A36] transition-colors">
+                010 157 3774
+              </a>
+              <a href="https://wa.me/27609915131" target="_blank" rel="noreferrer" className="block text-base font-semibold text-slate-900 hover:text-[#D76A36] transition-colors">
+                060 991 5131 (WhatsApp)
+              </a>
+            </div>
+            <p className="text-slate-600 text-sm mt-1">Primary phone and WhatsApp support</p>
           </div>
 
           {/* Domain Card */}
