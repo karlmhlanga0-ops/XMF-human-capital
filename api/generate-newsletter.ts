@@ -1,6 +1,15 @@
 import OpenAI from 'openai';
 
 export default async function handler(req: any, res: any) {
+  // 1. Handle CORS for local Codespaces testing
+  res.setHeader('Access-Control-Allow-Origin', '*');
+  res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+
+  if (req.method === 'OPTIONS') {
+    return res.status(200).end();
+  }
+
   if (req.method !== 'POST') {
     return res.status(405).json({ error: 'Method not allowed' });
   }
@@ -13,7 +22,15 @@ export default async function handler(req: any, res: any) {
       return res.status(400).json({ error: 'Invalid input: idea is required.' });
     }
 
+    // 2. Check if API Key is actually loaded
+    if (!process.env.OPENAI_API_KEY) {
+      console.error("CRITICAL: OPENAI_API_KEY is missing from environment variables.");
+      return res.status(500).json({ error: 'Server configuration error. API key missing.' });
+    }
+
     const client = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
+    
+    // 3. Call OpenAI
     const response = await client.chat.completions.create({
       model: 'gpt-3.5-turbo',
       messages: [
@@ -31,8 +48,9 @@ export default async function handler(req: any, res: any) {
 
     const text = response.choices?.[0]?.message?.content ?? '';
     return res.status(200).json({ text });
+    
   } catch (error) {
-    console.error(error);
-    return res.status(500).json({ error: 'Unable to generate newsletter.' });
+    console.error("OpenAI Execution Error:", error);
+    return res.status(500).json({ error: 'Unable to generate newsletter. Check server logs.' });
   }
 }

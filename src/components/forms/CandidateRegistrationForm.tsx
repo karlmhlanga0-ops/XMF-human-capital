@@ -118,7 +118,7 @@ export function CandidateRegistrationForm() {
 
   return (
     <>
-      {/* FLOATING DEMO BUTTON - DELETE THIS BLOCK AFTER THE DEMO */}
+      {/* FLOATING DEMO BUTTON - DELETE THIS BLOCK AFTER THE DEMO 
       <button 
         type="button" 
         onClick={() => reset({
@@ -131,7 +131,7 @@ export function CandidateRegistrationForm() {
         className="fixed bottom-8 right-8 z-[100] bg-[#f97316] hover:bg-[#ea680a] text-white font-bold py-3 px-6 rounded-full shadow-2xl flex items-center gap-2 animate-bounce border-2 border-white/20"
       >
         <span>🧪</span> Autofill (Demo)
-      </button>
+      </button>*/}
 
       <div className="w-full max-w-5xl mx-auto bg-[#161925] rounded-[2rem] border border-white/5 p-8 md:p-12 shadow-2xl relative overflow-hidden">
         <div className="absolute top-0 right-0 w-96 h-96 bg-[#f97316]/5 rounded-full blur-3xl -mr-20 -mt-20 pointer-events-none" />
